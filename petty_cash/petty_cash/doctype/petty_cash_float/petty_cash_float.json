@@ -1,11 +1,15 @@
 {
  "doctype": "DocType",
- "name": "Petty Cash Settings",
+ "name": "Petty Cash Float",
  "module": "Petty Cash",
- "issingle": 1,
+ "autoname": "field:cost_center",
+ "naming_rule": "By fieldname",
  "engine": "InnoDB",
- "modified": "2026-10-06 12:00:00.000000",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "modified": "2026-10-06 18:00:00.000000",
  "field_order": [
+  "cost_center",
   "company",
   "column_break_1",
   "imprest_amount",
@@ -23,11 +27,26 @@
  ],
  "fields": [
   {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "reqd": 1,
+   "set_only_once": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Each cost centre runs its own float; its expenses and replenishments post here."
+  },
+  {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "reqd": 1,
+   "read_only": 1,
+   "fetch_from": "cost_center.company",
+   "in_list_view": 1,
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_1",
@@ -38,6 +57,7 @@
    "fieldtype": "Currency",
    "label": "Imprest Amount",
    "default": "5000",
+   "in_list_view": 1,
    "description": "Fixed amount to maintain in petty cash"
   },
   {
@@ -58,7 +78,9 @@
    "label": "Petty Cash Account",
    "options": "Account",
    "reqd": 1,
-   "description": "Cash account whose GL balance IS the petty cash balance."
+   "unique": 1,
+   "in_list_view": 1,
+   "description": "Cash account whose GL balance IS this float's balance; one account per float."
   },
   {
    "fieldname": "bank_account",
@@ -113,12 +135,17 @@
    "role": "System Manager",
    "read": 1,
    "write": 1,
-   "create": 1
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
   },
   {
    "role": "Accounts Manager",
    "read": 1,
-   "write": 1
+   "write": 1,
+   "create": 1,
+   "report": 1
   },
   {
    "role": "Petty Cash Custodian",

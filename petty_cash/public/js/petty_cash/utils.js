@@ -2,8 +2,13 @@
 
 const API = "petty_cash.api.";
 
-// Whitelisted call; resolves with r.message, frappe shows server errors itself.
-export const call = (method, args = {}) => frappe.xcall(API + method, args);
+// Whitelisted call scoped to the selected float (frappe drops the arg for methods without it);
+// resolves with r.message, frappe shows server errors itself.
+let petty_cash_float = localStorage.getItem("petty_cash_float") || "";
+export const set_float = (name) =>
+	localStorage.setItem("petty_cash_float", (petty_cash_float = name || ""));
+export const call = (method, args = {}) =>
+	frappe.xcall(API + method, { petty_cash_float, ...args });
 
 // Amounts render in the petty cash company's currency; set once the dashboard loads.
 let currency;

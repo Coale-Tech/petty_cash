@@ -1,6 +1,7 @@
 """Endpoints behind the ``petty-cash`` Desk page.
 
-The petty cash balance IS the GL balance of ``Petty Cash Settings.petty_cash_account``.
+One ``Petty Cash Float`` per cost centre; a float's balance IS the GL balance of its
+``petty_cash_account`` and every voucher it posts carries its cost centre.
 Every money movement is a native ERPNext voucher: expenses and replenishments
 are Journal Entries, supplier payments are Payment Entries, so nothing here
 keeps a second copy of a number.
@@ -33,11 +34,13 @@ def _write_remark(je):
 	je.flags.skip_remarks_creation = True
 
 
-def _settings(require_configured=True):
-	settings = frappe.get_single("Petty Cash Settings")
-	if require_configured and not settings.petty_cash_account:
-		frappe.throw(_("Petty Cash Settings not configured"))
-	return settings
+def _float(petty_cash_float, ptype="read"):
+	"""The float the page is working on; doc-level check so Cost Center user permissions apply."""
+	if not petty_cash_float:
+		frappe.throw(_("Select a petty cash float"))
+	doc = frappe.get_doc("Petty Cash Float", petty_cash_float)
+	doc.check_permission(ptype)
+	return doc
 
 
 def _gl_rows(account, criterion=None, limit=20):
@@ -74,23 +77,33 @@ def _template(t):
 
 
 def has_app_permission():
-	"""Show the Petty Cash tile on the apps screen only to users who can read the settings."""
-	return bool(frappe.has_permission("Petty Cash Settings", "read"))
+	"""Show the Petty Cash tile on the apps screen only to users who can read a float."""
+	return bool(frappe.has_permission("Petty Cash Float", "read"))
 
 
 @frappe.whitelist()
-def get_petty_cash_dashboard():
-	frappe.has_permission("Petty Cash Settings", "read", throw=True)
-	settings = _settings(require_configured=False)
-	if not settings.petty_cash_account:
+def get_petty_cash_dashboard(petty_cash_float: str | None = None):
+	"""Dashboard of the requested float, falling back to the first one the user can read."""
+	frappe.has_permission("Petty Cash Float", "read", throw=True)
+	floats = frappe.get_list("Petty Cash Float", fields=["name", "company"], order_by="name asc")
+	if not floats:
 		return {
 			"configured": False,
-			"company": settings.company or frappe.defaults.get_user_default("Company"),
+			"floats": [],
+			"access": _access(),
+			"company": frappe.defaults.get_user_default("Company"),
 		}
+	if petty_cash_float not in {f.name for f in floats}:
+		petty_cash_float = floats[0].name
+	settings = _float(petty_cash_float)
 
 	today = _gl_rows(settings.petty_cash_account, GLE.posting_date == getdate(), limit=0)
 	return {
 		"configured": True,
+		"floats": floats,
+		"petty_cash_float": settings.name,
+		"cost_center": settings.cost_center,
+		"access": _access(settings),
 		"current_balance": settings.get_current_balance(),
 		"imprest_amount": flt(settings.imprest_amount),
 		"replenishment_trigger": flt(settings.replenishment_trigger),
@@ -113,15 +126,13 @@ def get_petty_cash_dashboard():
 
 @frappe.whitelist()
 def get_petty_cash_transactions(
+	petty_cash_float: str,
 	from_date: str | None = None,
 	to_date: str | None = None,
 	transaction_type: str | None = None,
 	limit: int = 500,
 ):
-	frappe.has_permission("Petty Cash Settings", "read", throw=True)
-	settings = _settings(require_configured=False)
-	if not settings.petty_cash_account:
-		return []
+	settings = _float(petty_cash_float)
 
 	criterion = GLE.posting_date >= getdate(from_date) if from_date else GLE.posting_date.notnull()
 	if to_date:
@@ -135,6 +146,7 @@ def get_petty_cash_transactions(
 
 @frappe.whitelist(methods=["POST"])
 def create_expense(
+	petty_cash_float: str,
 	template_name: str,
 	amount: float,
 	posting_date: str | None = None,
@@ -143,7 +155,7 @@ def create_expense(
 ):
 	"""Direct expense: Journal Entry debiting the template's expense account, crediting petty cash."""
 	frappe.has_permission("Journal Entry", "submit", throw=True)
-	settings = _settings()
+	settings = _float(petty_cash_float)
 	amount = flt(amount)
 	if amount <= 0:
 		frappe.throw(_("Amount must be greater than zero"))
@@ -187,7 +199,7 @@ def create_expense(
 		{
 			"account": debit_account,
 			"debit_in_account_currency": amount,
-			"cost_center": frappe.get_cached_value("Company", settings.company, "cost_center"),
+			"cost_center": settings.cost_center,
 		},
 	)
 	je.append(
@@ -195,6 +207,7 @@ def create_expense(
 		{
 			"account": template.credit_account or settings.petty_cash_account,
 			"credit_in_account_currency": amount,
+			"cost_center": settings.cost_center,
 		},
 	)
 	_write_remark(je)
@@ -203,29 +216,36 @@ def create_expense(
 	return {"success": True, "journal_entry": je.name}
 
 
-def _replenishment_je(settings, petty_cash_account, bank_account, amount, posting_date):
+def _replenishment_je(settings, bank_account, amount, posting_date):
 	je = frappe.new_doc("Journal Entry")
 	je.voucher_type = "Bank Entry"
 	je.posting_date = getdate(posting_date) if posting_date else nowdate()
 	je.company = settings.company
 	je.cheque_no = f"REP-{je.posting_date}"
 	je.cheque_date = je.posting_date
-	je.append("accounts", {"account": petty_cash_account, "debit_in_account_currency": amount})
-	je.append("accounts", {"account": bank_account, "credit_in_account_currency": amount})
+	for account, side in ((settings.petty_cash_account, "debit"), (bank_account, "credit")):
+		je.append(
+			"accounts",
+			{
+				"account": account,
+				f"{side}_in_account_currency": amount,
+				"cost_center": settings.cost_center,
+			},
+		)
 	return je
 
 
 @frappe.whitelist(methods=["POST"])
 def replenish_petty_cash(
+	petty_cash_float: str,
 	amount: float | None = None,
 	bank_account: str | None = None,
 	posting_date: str | None = None,
 	reference_no: str | None = None,
 ):
 	"""Top the float back up: submitted Bank Entry debiting petty cash, crediting the bank."""
-	frappe.has_permission("Petty Cash Settings", "write", throw=True)
 	frappe.has_permission("Journal Entry", "submit", throw=True)
-	settings = _settings()
+	settings = _float(petty_cash_float, "write")
 	amount = flt(amount) if amount else settings.get_replenishment_amount()
 	if amount <= 0:
 		frappe.throw(_("No replenishment needed. Petty cash is at or above imprest level."))
@@ -233,7 +253,7 @@ def replenish_petty_cash(
 	if not bank_account:
 		frappe.throw(_("Bank account not specified and no default configured"))
 
-	je = _replenishment_je(settings, settings.petty_cash_account, bank_account, amount, posting_date)
+	je = _replenishment_je(settings, bank_account, amount, posting_date)
 	je.user_remark = _("Petty cash replenishment to imprest level")
 	if reference_no:
 		je.cheque_no = reference_no
@@ -248,28 +268,27 @@ def replenish_petty_cash(
 	}
 
 
-def _access():
-	can_manage = bool(frappe.has_permission("Petty Cash Settings", "write"))
-	can_read = bool(frappe.has_permission("Petty Cash Settings", "read"))
-	allow_view = frappe.db.get_single_value("Petty Cash Settings", "allow_cashier_settings_view")
+def _access(settings=None):
+	"""Settings rights for one float; with none yet, managing = creating the first float."""
+	can_create = bool(frappe.has_permission("Petty Cash Float", "create"))
+	can_manage = bool(settings.has_permission("write")) if settings else can_create
 	return {
 		"can_manage_settings": can_manage,
-		"can_view_settings": can_manage or bool(can_read and allow_view),
+		"can_create_float": can_create,
+		"can_view_settings": can_manage or bool(settings and settings.allow_cashier_settings_view),
 		"can_create_transactions": bool(frappe.has_permission("Journal Entry", "submit")),
 	}
 
 
 @frappe.whitelist()
-def check_user_access():
-	return _access()
-
-
-@frappe.whitelist()
-def get_petty_cash_settings():
-	if not _access()["can_view_settings"]:
+def get_petty_cash_settings(petty_cash_float: str | None = None):
+	"""Settings of a float, or the defaults of a new one when ``petty_cash_float`` is empty."""
+	s = _float(petty_cash_float) if petty_cash_float else frappe.new_doc("Petty Cash Float")
+	if not _access(None if s.is_new() else s)["can_view_settings"]:
 		frappe.throw(_("Not permitted to view petty cash settings"), frappe.PermissionError)
-	s = _settings(require_configured=False)
 	return {
+		"name": None if s.is_new() else s.name,
+		"cost_center": s.cost_center,
 		"company": s.company,
 		"imprest_amount": s.imprest_amount,
 		"replenishment_trigger": s.replenishment_trigger,
@@ -283,12 +302,15 @@ def get_petty_cash_settings():
 
 
 @frappe.whitelist(methods=["POST"])
-def save_petty_cash_settings(settings: str | dict):
-	frappe.has_permission("Petty Cash Settings", "write", throw=True)
+def save_petty_cash_settings(settings: str | dict, petty_cash_float: str | None = None):
+	"""Update a float, or create one when ``petty_cash_float`` is empty."""
 	data = frappe._dict(frappe.parse_json(settings))
-	doc = _settings(require_configured=False)
-	if data.company:
-		doc.company = data.company
+	if petty_cash_float:
+		doc = _float(petty_cash_float, "write")
+	else:
+		frappe.has_permission("Petty Cash Float", "create", throw=True)
+		doc = frappe.new_doc("Petty Cash Float")
+		doc.cost_center = data.cost_center
 	for field in ("imprest_amount", "replenishment_trigger"):
 		if data.get(field) is not None:
 			doc.set(field, flt(data.get(field)))
@@ -301,7 +323,7 @@ def save_petty_cash_settings(settings: str | dict):
 		if t.get("template_name"):
 			doc.append("expense_templates", {f: t.get(f) or None for f in TEMPLATE_FIELDS})
 	doc.save()
-	return {"success": True}
+	return {"success": True, "name": doc.name}
 
 
 @frappe.whitelist()
@@ -443,20 +465,16 @@ def _journal_entries(account, limit, replenishments_only=False):
 
 
 @frappe.whitelist()
-def get_recent_journal_entries(limit: int = 50):
+def get_recent_journal_entries(petty_cash_float: str, limit: int = 50):
 	frappe.has_permission("Journal Entry", "read", throw=True)
-	settings = _settings(require_configured=False)
-	if not settings.petty_cash_account:
-		return {"data": []}
+	settings = _float(petty_cash_float)
 	return {"data": _journal_entries(settings.petty_cash_account, limit)}
 
 
 @frappe.whitelist()
-def get_recent_payment_entries(limit: int = 50):
+def get_recent_payment_entries(petty_cash_float: str, limit: int = 50):
 	frappe.has_permission("Payment Entry", "read", throw=True)
-	settings = _settings(require_configured=False)
-	if not settings.petty_cash_account:
-		return {"data": []}
+	settings = _float(petty_cash_float)
 	pe = DocType("Payment Entry")
 	account = settings.petty_cash_account
 	return {
@@ -484,11 +502,9 @@ def get_recent_payment_entries(limit: int = 50):
 
 
 @frappe.whitelist()
-def get_replenishment_requests(limit: int = 50):
+def get_replenishment_requests(petty_cash_float: str, limit: int = 50):
 	frappe.has_permission("Journal Entry", "read", throw=True)
-	settings = _settings(require_configured=False)
-	if not settings.petty_cash_account:
-		return {"data": []}
+	settings = _float(petty_cash_float)
 	balance = settings.get_current_balance()
 	status = {0: "Draft", 1: "Completed", 2: "Cancelled"}
 	return {
@@ -547,23 +563,17 @@ def create_journal_entry(data: str | dict):
 
 
 @frappe.whitelist(methods=["POST"])
-def create_replenishment_request(data: str | dict):
+def create_replenishment_request(data: str | dict, petty_cash_float: str):
 	"""Draft Bank Entry for the Accounts Manager to review and submit."""
 	frappe.has_permission("Journal Entry", "create", throw=True)
 	data = frappe._dict(frappe.parse_json(data))
-	settings = _settings()
+	settings = _float(petty_cash_float)
 	if not settings.bank_account:
-		frappe.throw(_("Bank account not configured in Petty Cash Settings"))
+		frappe.throw(_("Bank account not configured for this petty cash float"))
 	amount = flt(data.requested_amount)
 	if amount <= 0:
 		frappe.throw(_("Requested amount must be greater than zero"))
-	je = _replenishment_je(
-		settings,
-		data.petty_cash_account or settings.petty_cash_account,
-		settings.bank_account,
-		amount,
-		data.posting_date,
-	)
+	je = _replenishment_je(settings, settings.bank_account, amount, data.posting_date)
 	je.user_remark = data.reason or _("Petty cash replenishment request")
 	je.insert()
 	return {"success": True, "data": {"name": je.name}}
@@ -571,6 +581,7 @@ def create_replenishment_request(data: str | dict):
 
 @frappe.whitelist(methods=["POST"])
 def pay_supplier_with_references(
+	petty_cash_float: str,
 	supplier: str,
 	amount: float,
 	mode_of_payment: str | None = None,
@@ -581,7 +592,7 @@ def pay_supplier_with_references(
 	references: str | list | None = None,
 ):
 	frappe.has_permission("Payment Entry", "submit", throw=True)
-	settings = _settings()
+	settings = _float(petty_cash_float)
 	amount = flt(amount)
 	if amount <= 0:
 		frappe.throw(_("Amount must be greater than zero"))
@@ -599,6 +610,7 @@ def pay_supplier_with_references(
 	pe.company = settings.company
 	pe.mode_of_payment = mode_of_payment or "Cash"
 	pe.paid_from = settings.petty_cash_account
+	pe.cost_center = settings.cost_center
 	pe.paid_to = details["payable_account"]
 	pe.paid_amount = amount
 	pe.received_amount = amount

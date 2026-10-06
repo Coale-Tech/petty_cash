@@ -15,10 +15,22 @@ DEFAULT_EXPENSE_TEMPLATES = (
 )
 
 
-class PettyCashSettings(Document):
+class PettyCashFloat(Document):
 	def validate(self):
 		if self.petty_cash_account and self.bank_account and self.petty_cash_account == self.bank_account:
 			frappe.throw(_("Petty Cash Account and Replenishment Bank Account must be different accounts."))
+		if frappe.get_cached_value("Cost Center", self.cost_center, "is_group"):
+			frappe.throw(
+				_("Cost Center {0} is a group; pick a non-group cost centre.").format(self.cost_center)
+			)
+		for field in ("petty_cash_account", "bank_account", "default_expense_account"):
+			account = self.get(field)
+			if account and frappe.get_cached_value("Account", account, "company") != self.company:
+				frappe.throw(
+					_("{0} {1} does not belong to company {2}").format(
+						_(self.meta.get_label(field)), account, self.company
+					)
+				)
 		if self.company and not self.expense_templates:
 			self.seed_expense_templates()
 

@@ -13,6 +13,7 @@ import {
 	bind_pager,
 	empty_state,
 	make_control,
+	set_float,
 } from "./utils";
 
 const PAGE_SIZE = 10;
@@ -240,7 +241,7 @@ function list_card($parent, { title, doctype, load, columns, cells, empty }) {
 // ---------- Journal Entries ----------
 
 // One Journal Entry Account row (debit = expense side, credit = petty cash side).
-function entry_block($parent, side, company, on_amount, petty) {
+function entry_block($parent, side, company, on_amount, cost_center, petty) {
 	const debit = side === "debit";
 	const $block = $(
 		`<div class="pc-entry-block pc-entry-${side}">${
@@ -270,6 +271,7 @@ function entry_block($parent, side, company, on_amount, petty) {
 			fieldtype: "Link",
 			options: "Cost Center",
 			label: __("Cost Center"),
+			default: cost_center,
 			get_query: by_company({ is_group: 0 }),
 		},
 		{
@@ -418,11 +420,19 @@ export function render_journal_entry_tab($c, ctx) {
 				.html(`${icon(ic)}<span>${esc(msg)}</span>`);
 		};
 		// Credit mirrors the debit amount (single expense line against petty cash).
-		debit = entry_block($form, "debit", company, () => {
-			credit?.amount.set_value(debit.amount.get_value());
-			update_balance();
-		});
-		credit = entry_block($form, "credit", company, update_balance, petty);
+		// Both lines default to the float's cost centre.
+		const cc = ctx.dashboard?.cost_center;
+		debit = entry_block(
+			$form,
+			"debit",
+			company,
+			() => {
+				credit?.amount.set_value(debit.amount.get_value());
+				update_balance();
+			},
+			cc
+		);
+		credit = entry_block($form, "credit", company, update_balance, cc, petty);
 		$balance.appendTo($form);
 		update_balance();
 
@@ -660,7 +670,8 @@ const norm_template = (t) =>
 const short_account = (a) => (a ? a.replace(/ - [^-]+$/, "") : __("Not set"));
 
 function draw_settings($c, ctx, s) {
-	const can = ctx.access.can_manage_settings;
+	// No name = a new float; creating needs create rights, editing needs write on this float.
+	const can = s.name ? ctx.access.can_manage_settings : ctx.access.can_create_float;
 	let templates = (s.expense_templates || []).map(norm_template);
 	let original, $save, $reset;
 	const c = {};
@@ -727,29 +738,55 @@ function draw_settings($c, ctx, s) {
 
 	Object.assign(
 		c,
-		grid(body(section(__("General Settings"), __("Configure petty cash imprest system"))), 2, [
-			field({
-				fieldname: "company",
-				fieldtype: "Link",
-				options: "Company",
-				label: __("Company"),
-				placeholder: __("Select company..."),
-				reqd: 1,
-			}),
-			null,
-			field({
-				fieldname: "imprest_amount",
-				fieldtype: "Currency",
-				label: __("Imprest Amount"),
-				description: __("Fixed amount to maintain in petty cash"),
-			}),
-			field({
-				fieldname: "replenishment_trigger",
-				fieldtype: "Currency",
-				label: __("Replenishment Trigger"),
-				description: __("Alert when balance falls below this"),
-			}),
-		]),
+		grid(
+			body(
+				section(
+					__("General Settings"),
+					__("Cost centre this float belongs to and its imprest")
+				)
+			),
+			2,
+			[
+				// The cost centre names the float, so both are fixed once it exists.
+				{
+					...field({
+						fieldname: "company",
+						fieldtype: "Link",
+						options: "Company",
+						label: __("Company"),
+						placeholder: __("Select company..."),
+						reqd: 1,
+					}),
+					read_only: s.name || !can ? 1 : 0,
+				},
+				{
+					...field({
+						fieldname: "cost_center",
+						fieldtype: "Link",
+						options: "Cost Center",
+						label: __("Cost Center"),
+						description: __("Each cost centre runs its own float"),
+						reqd: 1,
+						get_query: () => ({
+							filters: { company: c.company?.get_value() || s.company, is_group: 0 },
+						}),
+					}),
+					read_only: s.name || !can ? 1 : 0,
+				},
+				field({
+					fieldname: "imprest_amount",
+					fieldtype: "Currency",
+					label: __("Imprest Amount"),
+					description: __("Fixed amount to maintain in petty cash"),
+				}),
+				field({
+					fieldname: "replenishment_trigger",
+					fieldtype: "Currency",
+					label: __("Replenishment Trigger"),
+					description: __("Alert when balance falls below this"),
+				}),
+			]
+		),
 		grid(body(section(__("Account Settings"), __("Configure ledger accounts"))), 2, [
 			account(
 				"petty_cash_account",
@@ -942,13 +979,24 @@ function draw_settings($c, ctx, s) {
 		<button class="btn btn-primary btn-sm">${__("Save Settings")}</button>
 	</div>`).appendTo($root);
 	$reset = $bar.find(".btn-default").on("click", () => draw_settings($c, ctx, s));
+	if (s.name && ctx.access.can_create_float) {
+		$(`<button class="btn btn-default btn-sm">${icon("plus")} ${__("New Float")}</button>`)
+			.on("click", () =>
+				call("get_petty_cash_settings", { petty_cash_float: "" }).then((n) =>
+					draw_settings($c, ctx, n)
+				)
+			)
+			.prependTo($bar);
+	}
 	$save = $bar.find(".btn-primary").on("click", async () => {
 		$save.prop("disabled", true);
 		try {
 			check_reqd(c);
-			await call("save_petty_cash_settings", {
+			const r = await call("save_petty_cash_settings", {
+				petty_cash_float: s.name || "",
 				settings: { ...values(c), expense_templates: templates },
 			});
+			set_float(r.name);
 			await created(ctx, __("Settings saved successfully"));
 		} catch (e) {
 			console.error(e); // frappe already showed the message

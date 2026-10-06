@@ -5,6 +5,9 @@ Every money movement is a native ERPNext voucher; the balance is the GL balance 
 petty cash account (`erpnext.accounts.utils.get_balance_on`), so nothing keeps a second copy
 of a number.
 
+Each cost centre runs its own float (**Petty Cash Float**, named after the cost centre, with its own cash
+account). The page header has a float selector; every voucher row it creates carries that cost centre.
+
 | Tab | What it does |
 |---|---|
 | Dashboard | Balance, replenishment status (below the trigger), today's spend, quick actions, recent transactions |
@@ -12,7 +15,7 @@ of a number.
 | Journal Entries | Create a balanced JE against petty cash; recent JEs that touch the account |
 | Payments | Payment Entries paid from petty cash |
 | Replenishments | Replenishment requests (draft Bank Entries for the Accounts Manager to submit) |
-| Settings | Company, imprest amount, trigger, accounts, expense templates, controls |
+| Settings | The selected float: cost centre, imprest amount, trigger, accounts, expense templates, controls; **New Float** |
 
 Quick actions:
 
@@ -33,29 +36,39 @@ Requires `erpnext`.
 
 #### Configure
 
-1. Create a non-group **Cash** account for the float (e.g. `Petty Cash - ABBR` under `Cash In Hand`).
-2. Open **Petty Cash -> Settings** (or `/app/petty-cash-settings`), pick the company, petty cash account,
-   replenishment bank account, imprest amount and trigger, then save.
+1. Create a non-group **Cash** account per float (e.g. `Petty Cash - Main - ABBR` under `Cash In Hand`).
+2. Open **Petty Cash -> Settings** (or `/app/petty-cash-float/new`), pick the cost centre, petty cash account,
+   replenishment bank account, imprest amount and trigger, then save. Repeat with **New Float** for each cost centre.
    Saving with a company and an empty template table seeds six expense templates (Fuel & Transport, Airtime & Data,
    Office Supplies, Cleaning & Consumables, Repairs & Maintenance, Miscellaneous) mapped to the standard
    chart's expense accounts; templates whose account is missing fall back to the default expense account.
 3. Give the person who holds the float the **Petty Cash Custodian** role plus **Accounts User**
-   (vouchers are submitted with the user's own permissions).
+   (vouchers are submitted with the user's own permissions). To limit a custodian to their own float, add a
+   **User Permission** on their Cost Center.
 
 #### Roles
 
 | Role | Access |
 |---|---|
 | System Manager | everything |
-| Accounts Manager | page + settings read/write |
-| Petty Cash Custodian | page + settings read; the Settings tab is visible only if "Allow Cashiers to View Settings" is on |
+| Accounts Manager | page + floats read/write/create |
+| Petty Cash Custodian | page + float read; the Settings tab is visible only if "Allow Cashiers to View Settings" is on |
+
+#### Customer Statement
+
+- Report **Customer Statement** (Selling sidebar, after Customer Credit Balance; also **View -> Customer Statement**
+  on the Customer form): opening balance, invoices/payments/returns with running balance, ageing.
+- **Statement PDF** renders the `Customer Statement` print format (Chrome PDF generator) with the issuer's logo,
+  tax ID and contacts from the Company and the first company Bank Account as payment details.
 
 #### Notes
 
 - Assets are bundled as `petty_cash_desk.bundle.{js,css}`; bundle names are bench-wide, so another app's
   `petty_cash.bundle.*` cannot shadow them.
-- Cannot be installed on a site that already defines the `Petty Cash Settings` / `Petty Cash Expense Template`
-  doctypes or the `petty-cash` page from another app.
+- Cannot be installed on a site that already defines the `Petty Cash Float` / `Petty Cash Expense Template`
+  doctypes, the `petty-cash` page, or a `Customer Statement` report/print format (e.g. from `raven`).
+- Upgrading from the single `Petty Cash Settings` doctype: `migrate` turns it into a float on the company's
+  default cost centre.
 
 #### License
 

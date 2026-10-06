@@ -12,6 +12,7 @@ import {
 	money,
 	pager_html,
 	set_company,
+	set_float,
 	voucher_link,
 } from "./utils";
 import { open_expense_dialog, open_pay_supplier_dialog, open_replenish_dialog } from "./dialogs";
@@ -69,9 +70,14 @@ petty_cash.PettyCashPage = class PettyCashPage {
 						"Cash handling, supplier payments, expense tracking, and replenishments"
 					)}</p>
 				</div>
-				<button class="btn btn-default btn-sm pc-refresh">
-					<span class="pc-icon-wrap">${icon("refresh-ccw")}</span>${__("Refresh")}
-				</button>
+				<div class="pc-header-actions">
+					<select class="form-control input-sm pc-float" title="${__(
+						"Petty Cash Float"
+					)}" style="display: none"></select>
+					<button class="btn btn-default btn-sm pc-refresh">
+						<span class="pc-icon-wrap">${icon("refresh-ccw")}</span>${__("Refresh")}
+					</button>
+				</div>
 			</div>
 			<div class="pc-status"></div>
 			<div class="pc-tabs-card" style="display: none">
@@ -81,6 +87,10 @@ petty_cash.PettyCashPage = class PettyCashPage {
 		</div>`).appendTo(page.main);
 
 		this.$refresh = this.$root.find(".pc-refresh").on("click", () => this.refresh());
+		this.$float = this.$root.find(".pc-float").on("change", (e) => {
+			set_float(e.target.value);
+			this.refresh();
+		});
 		this.$status = this.$root
 			.find(".pc-status")
 			.on("click", ".pc-retry", () => this.refresh())
@@ -98,10 +108,12 @@ petty_cash.PettyCashPage = class PettyCashPage {
 		if (this.pending) return this.pending;
 		this.loading = true;
 		this.render_status();
-		this.pending = Promise.all([call("get_petty_cash_dashboard"), call("check_user_access")])
-			.then(([dashboard, access]) => {
-				Object.assign(this.ctx, { dashboard, access });
+		this.pending = call("get_petty_cash_dashboard")
+			.then((dashboard) => {
+				Object.assign(this.ctx, { dashboard, access: dashboard.access });
+				set_float(dashboard.petty_cash_float);
 				set_company(dashboard.company);
+				this.render_floats();
 				this.error = null;
 			})
 			.catch((e) => {
@@ -114,6 +126,19 @@ petty_cash.PettyCashPage = class PettyCashPage {
 				this.render_tabs();
 			});
 		return this.pending;
+	}
+
+	// One float per cost centre; the selector shows which cost centre the page is working on.
+	render_floats() {
+		const { floats = [], petty_cash_float } = this.ctx.dashboard;
+		this.$float
+			.html(
+				floats
+					.map((f) => `<option value="${esc(f.name)}">${esc(f.name)}</option>`)
+					.join("")
+			)
+			.val(petty_cash_float)
+			.toggle(floats.length > 0);
 	}
 
 	set_tab(name) {
@@ -148,14 +173,14 @@ petty_cash.PettyCashPage = class PettyCashPage {
 			html += `<div class="pc-alert pc-alert-amber">
 				${icon("triangle-alert", "md")}
 				<div>
-					<div class="pc-alert-title">${__("Petty Cash Settings not configured")}</div>
+					<div class="pc-alert-title">${__("No petty cash float configured")}</div>
 					${
 						can_manage
 							? `<p>${__(
-									"Please configure the petty cash account and imprest amount in the Settings tab to get started."
+									"Create a float for a cost centre in the Settings tab: petty cash account, imprest amount and templates."
 							  )}</p>
 							<div class="pc-alert-actions">
-								<button class="btn btn-default btn-sm pc-configure">${__("Configure Settings")}</button>
+								<button class="btn btn-default btn-sm pc-configure">${__("Create Float")}</button>
 							</div>`
 							: ""
 					}
@@ -171,8 +196,11 @@ petty_cash.PettyCashPage = class PettyCashPage {
 		this.$card.toggle(show);
 		if (!show) return;
 
-		const tabs = TABS.filter((t) => t.key !== "settings" || a?.can_view_settings);
-		if (!tabs.some((t) => t.key === this.tab)) this.tab = "dashboard";
+		// Without a float only Settings (creating the first float) has anything to show.
+		const tabs = TABS.filter((t) =>
+			d.configured ? t.key !== "settings" || a?.can_view_settings : t.key === "settings"
+		);
+		if (!tabs.some((t) => t.key === this.tab)) this.tab = tabs[0].key;
 		const counts = {
 			dashboard: d.needs_replenishment ? "!" : null,
 			transactions: d.today_summary?.expense_count || null,

@@ -22,6 +22,12 @@ add_to_apps_screen = [
 
 fixtures = [{"dt": "Role", "filters": [["name", "=", "Petty Cash Custodian"]]}]
 
+# Customer Statement: Customer form button, print-format data function, Selling sidebar link
+doctype_js = {"Customer": "public/js/customer.js"}
+jinja = {"methods": ["petty_cash.petty_cash.report.customer_statement.customer_statement.get_statement"]}
+after_install = "petty_cash.install.add_customer_statement_to_selling_sidebar"
+after_migrate = ["petty_cash.install.add_customer_statement_to_selling_sidebar"]
+
 # Includes in <head>
 # ------------------
 

@@ -26,6 +26,15 @@
 		flex-wrap: wrap;
 		margin-bottom: var(--margin-md);
 	}
+	.pc-header-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--padding-sm);
+	}
+	.pc-float {
+		width: auto;
+		min-width: 12rem;
+	}
 	.pc-title {
 		margin: 0;
 		font-size: var(--text-xl);
