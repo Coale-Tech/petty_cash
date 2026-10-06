@@ -5,13 +5,10 @@ const API = "petty_cash.api.";
 // Whitelisted call; resolves with r.message, frappe shows server errors itself.
 export const call = (method, args = {}) => frappe.xcall(API + method, args);
 
-const money_fmt = new Intl.NumberFormat("en-KE", {
-	style: "currency",
-	currency: "KES",
-	minimumFractionDigits: 0,
-	maximumFractionDigits: 0,
-});
-export const money = (v) => money_fmt.format(flt(v));
+// Amounts render in the petty cash company's currency; set once the dashboard loads.
+let currency;
+export const set_company = (company) => (currency = erpnext.get_currency(company));
+export const money = (v) => format_currency(flt(v), currency, 0);
 
 export const fmt_date = (d) =>
 	d

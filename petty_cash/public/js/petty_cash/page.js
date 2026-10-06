@@ -11,6 +11,7 @@ import {
 	make_control,
 	money,
 	pager_html,
+	set_company,
 	voucher_link,
 } from "./utils";
 import { open_expense_dialog, open_pay_supplier_dialog, open_replenish_dialog } from "./dialogs";
@@ -100,6 +101,7 @@ petty_cash.PettyCashPage = class PettyCashPage {
 		this.pending = Promise.all([call("get_petty_cash_dashboard"), call("check_user_access")])
 			.then(([dashboard, access]) => {
 				Object.assign(this.ctx, { dashboard, access });
+				set_company(dashboard.company);
 				this.error = null;
 			})
 			.catch((e) => {
