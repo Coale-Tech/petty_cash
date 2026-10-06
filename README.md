@@ -24,7 +24,7 @@ Quick actions:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch main   # or copy the folder into apps/ and `bench setup requirements`
+bench get-app https://github.com/Coale-Tech/petty_cash --branch main
 bench --site <site> install-app petty_cash
 bench build --app petty_cash
 ```
