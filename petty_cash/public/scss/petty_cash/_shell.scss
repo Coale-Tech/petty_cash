@@ -3,7 +3,7 @@
 
 .pc-root {
 	--icon-stroke: currentColor;
-	padding: var(--padding-md) 0;
+	padding: var(--padding-md); // same 15px inset as native list/page content
 
 	.pc-icon-wrap {
 		display: inline-flex;
