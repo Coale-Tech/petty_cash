@@ -19,7 +19,7 @@ class PettyCashSettings(Document):
 	def validate(self):
 		if self.petty_cash_account and self.bank_account and self.petty_cash_account == self.bank_account:
 			frappe.throw(_("Petty Cash Account and Replenishment Bank Account must be different accounts."))
-		if self.company and not self.expense_templates and self.has_value_changed("company"):
+		if self.company and not self.expense_templates:
 			self.seed_expense_templates()
 
 	def seed_expense_templates(self):

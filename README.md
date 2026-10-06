@@ -36,7 +36,7 @@ Requires `erpnext`.
 1. Create a non-group **Cash** account for the float (e.g. `Petty Cash - ABBR` under `Cash In Hand`).
 2. Open **Petty Cash -> Settings** (or `/app/petty-cash-settings`), pick the company, petty cash account,
    replenishment bank account, imprest amount and trigger, then save.
-   Choosing the company the first time seeds six expense templates (Fuel & Transport, Airtime & Data,
+   Saving with a company and an empty template table seeds six expense templates (Fuel & Transport, Airtime & Data,
    Office Supplies, Cleaning & Consumables, Repairs & Maintenance, Miscellaneous) mapped to the standard
    chart's expense accounts; templates whose account is missing fall back to the default expense account.
 3. Give the person who holds the float the **Petty Cash Custodian** role plus **Accounts User**
