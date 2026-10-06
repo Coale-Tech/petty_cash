@@ -1,0 +1,128 @@
+{
+ "doctype": "DocType",
+ "name": "Petty Cash Settings",
+ "module": "Petty Cash",
+ "issingle": 1,
+ "engine": "InnoDB",
+ "modified": "2026-10-06 12:00:00.000000",
+ "field_order": [
+  "company",
+  "column_break_1",
+  "imprest_amount",
+  "replenishment_trigger",
+  "section_break_accounts",
+  "petty_cash_account",
+  "bank_account",
+  "column_break_2",
+  "default_expense_account",
+  "section_break_templates",
+  "expense_templates",
+  "section_break_controls",
+  "require_receipt_reference",
+  "allow_cashier_settings_view"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "imprest_amount",
+   "fieldtype": "Currency",
+   "label": "Imprest Amount",
+   "default": "5000",
+   "description": "Fixed amount to maintain in petty cash"
+  },
+  {
+   "fieldname": "replenishment_trigger",
+   "fieldtype": "Currency",
+   "label": "Replenishment Trigger",
+   "default": "1000",
+   "description": "Alert when balance falls below this"
+  },
+  {
+   "fieldname": "section_break_accounts",
+   "fieldtype": "Section Break",
+   "label": "Accounts"
+  },
+  {
+   "fieldname": "petty_cash_account",
+   "fieldtype": "Link",
+   "label": "Petty Cash Account",
+   "options": "Account",
+   "reqd": 1,
+   "description": "Cash account whose GL balance IS the petty cash balance."
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account for Replenishment",
+   "options": "Account",
+   "description": "Bank account to withdraw from"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_expense_account",
+   "fieldtype": "Link",
+   "label": "Default Expense Account",
+   "options": "Account",
+   "description": "Fallback expense account"
+  },
+  {
+   "fieldname": "section_break_templates",
+   "fieldtype": "Section Break",
+   "label": "Expense Templates"
+  },
+  {
+   "fieldname": "expense_templates",
+   "fieldtype": "Table",
+   "label": "Expense Templates",
+   "options": "Petty Cash Expense Template"
+  },
+  {
+   "fieldname": "section_break_controls",
+   "fieldtype": "Section Break",
+   "label": "Controls"
+  },
+  {
+   "fieldname": "require_receipt_reference",
+   "fieldtype": "Check",
+   "label": "Require Receipt Reference",
+   "default": "1"
+  },
+  {
+   "fieldname": "allow_cashier_settings_view",
+   "fieldtype": "Check",
+   "label": "Allow Cashiers to View Settings",
+   "default": "0",
+   "description": "If unchecked, only managers can access the Settings tab"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "Accounts Manager",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "Petty Cash Custodian",
+   "read": 1
+  }
+ ]
+}

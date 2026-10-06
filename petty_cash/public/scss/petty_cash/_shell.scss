@@ -1,0 +1,338 @@
+// Page shell, tab bar, Dashboard + Transactions tabs (hoteli List.vue / DashboardTab / TransactionsTab).
+
+.pc-root {
+	--icon-stroke: currentColor;
+	padding: 16px 0;
+
+	.pc-icon-wrap {
+		display: inline-flex;
+	}
+	.pc-header .btn,
+	.pc-alert .btn,
+	.pc-filters .btn,
+	.pc-list-card .btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	// Header
+	.pc-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		flex-wrap: wrap;
+		margin-bottom: 16px;
+	}
+	.pc-title {
+		margin: 0;
+		font-size: var(--text-xl);
+		font-weight: var(--weight-bold);
+		color: var(--ink-gray-9);
+	}
+	.pc-subtitle {
+		margin: 2px 0 0;
+		font-size: var(--text-sm);
+		color: var(--ink-gray-7);
+	}
+
+	// Loading / error / not-configured
+	.pc-loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		padding: 48px 0;
+		color: var(--ink-gray-6);
+	}
+	.pc-status .pc-alert {
+		margin-bottom: 24px;
+		p {
+			margin: 4px 0 0;
+		}
+	}
+	.pc-alert-actions {
+		margin-top: 12px;
+	}
+	.pc-btn-amber {
+		background: var(--amber-500);
+		border-color: transparent;
+		color: var(--neutral-white);
+		&:hover {
+			background: var(--amber-600);
+			color: var(--neutral-white);
+		}
+	}
+
+	// Tab bar card
+	.pc-tabs-card {
+		background: var(--surface-white);
+		border-radius: var(--border-radius-lg);
+		box-shadow: var(--shadow-sm);
+		margin-bottom: 16px;
+	}
+	.pc-tabs {
+		display: flex;
+		gap: 16px;
+		padding: 0 16px;
+		border-bottom: 1px solid var(--outline-gray-2);
+		overflow-x: auto;
+	}
+	.pc-tab {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		white-space: nowrap;
+		padding: 16px 8px;
+		margin-bottom: -1px;
+		border: 0;
+		border-bottom: 2px solid transparent;
+		background: none;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--ink-gray-6);
+		&:hover {
+			color: var(--ink-gray-7);
+			border-bottom-color: var(--outline-gray-3);
+		}
+		&.active {
+			color: var(--ink-blue-3);
+			border-bottom-color: var(--ink-blue-3);
+		}
+	}
+	.pc-tab-body {
+		padding: 16px;
+	}
+
+	// Dashboard
+	.pc-dashboard {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	.pc-stats,
+	.pc-quick-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 16px;
+		@media (min-width: 640px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+		@media (min-width: 1024px) {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+	.pc-stat {
+		border-radius: var(--border-radius-lg);
+		padding: 24px;
+		color: var(--neutral-white);
+	}
+	@each $c in "blue", "red", "green", "purple" {
+		.pc-stat-#{$c} {
+			background: linear-gradient(to bottom right, var(--#{$c}-500), var(--#{$c}-600));
+			--pc-stat-muted: var(--#{$c}-100);
+		}
+	}
+	.pc-stat-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.pc-stat-label {
+		font-size: var(--text-sm);
+		color: var(--pc-stat-muted);
+	}
+	.pc-stat-value {
+		margin-top: 4px;
+		font-size: var(--text-3xl);
+		font-weight: var(--weight-bold);
+	}
+	.pc-stat-icon {
+		display: flex;
+		padding: 12px;
+		border-radius: var(--border-radius-full);
+		background: var(--white-overlay-100);
+		.icon {
+			width: 32px;
+			height: 32px;
+		}
+	}
+	.pc-stat-foot {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 16px;
+		font-size: var(--text-sm);
+		color: var(--pc-stat-muted);
+	}
+
+	.pc-quick {
+		box-shadow: var(--shadow-sm);
+		padding: 24px;
+	}
+	.pc-quick-action {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		height: 80px;
+		padding: 0 16px;
+		text-align: left;
+		background: var(--surface-white);
+		border: 1px solid var(--outline-gray-2);
+		border-radius: var(--border-radius-md);
+		color: var(--ink-gray-8);
+		&:hover {
+			background: var(--surface-gray-2);
+		}
+		&:last-child {
+			@media (min-width: 640px) and (max-width: 1023px) {
+				grid-column: span 2;
+			}
+		}
+		&.pc-danger {
+			border-color: var(--outline-red-2);
+			color: var(--ink-red-4);
+			&:hover {
+				background: var(--surface-red-1);
+			}
+		}
+	}
+	.pc-qa-title {
+		display: block;
+		font-weight: var(--weight-medium);
+	}
+	.pc-qa-sub {
+		display: block;
+		font-size: var(--text-xs);
+		color: var(--ink-gray-5);
+	}
+	.pc-qa-blue {
+		color: var(--ink-blue-3);
+	}
+	.pc-qa-orange {
+		color: var(--orange-600);
+	}
+	.pc-qa-red {
+		color: var(--ink-red-3);
+	}
+	.pc-qa-green {
+		color: var(--ink-green-3);
+	}
+
+	// List cards (Recent Transactions / Transactions)
+	.pc-list-card {
+		padding: 0;
+		overflow: hidden;
+		box-shadow: var(--shadow-sm);
+	}
+	.pc-list-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		flex-wrap: wrap;
+		padding: 16px;
+		border-bottom: 1px solid var(--outline-gray-2);
+		h3 {
+			margin: 0;
+			font-size: var(--text-base);
+			font-weight: var(--weight-semibold);
+			color: var(--ink-gray-9);
+		}
+	}
+	.pc-list-head-right {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.pc-list-body {
+		min-height: 200px;
+		padding: 8px 16px 12px;
+	}
+
+	// Transactions
+	.pc-transactions {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.pc-filters {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		gap: 16px;
+		.form-group {
+			margin-bottom: 0;
+		}
+	}
+	.pc-filter {
+		width: 160px;
+	}
+	.pc-filter-buttons {
+		display: flex;
+		gap: 8px;
+	}
+	.pc-select-banner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 8px 16px;
+		background: var(--surface-gray-2);
+		border-bottom: 1px solid var(--outline-gray-2);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+	}
+	.pc-select-actions {
+		display: flex;
+		gap: 8px;
+	}
+	.pc-list .pc-check-col {
+		width: 32px;
+		input {
+			margin: 0;
+		}
+	}
+	.pc-totals {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin: 12px -16px 0;
+		padding: 12px 16px;
+		background: var(--surface-gray-1);
+		border-top: 1px solid var(--outline-gray-2);
+		border-bottom: 1px solid var(--outline-gray-2);
+		font-size: var(--text-sm);
+	}
+	.pc-totals-amounts {
+		display: flex;
+		gap: 24px;
+		flex-wrap: wrap;
+	}
+	.pc-net {
+		font-weight: var(--weight-bold);
+	}
+	.pc-pager-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		padding-top: 12px;
+		label {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin: 0;
+		}
+		select {
+			width: auto;
+		}
+		.pc-pager {
+			flex: 1;
+			padding-top: 0;
+		}
+	}
+}

@@ -1,0 +1,9 @@
+[
+ {
+  "doctype": "Role",
+  "name": "Petty Cash Custodian",
+  "role_name": "Petty Cash Custodian",
+  "desk_access": 1,
+  "is_custom": 0
+ }
+]

@@ -1,0 +1,21 @@
+{
+ "content": null,
+ "doctype": "Page",
+ "module": "Petty Cash",
+ "name": "petty-cash",
+ "page_name": "petty-cash",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Petty Cash Custodian"
+  }
+ ],
+ "standard": "Yes",
+ "style": null,
+ "title": "Petty Cash"
+}

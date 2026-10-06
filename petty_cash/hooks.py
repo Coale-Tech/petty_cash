@@ -8,18 +8,19 @@ app_license = "gpl-3.0"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["erpnext"]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "petty_cash",
-# 		"logo": "/assets/petty_cash/logo.png",
-# 		"title": "Petty Cash",
-# 		"route": "/petty_cash",
-# 		"has_permission": "petty_cash.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "petty_cash",
+		"logo": "/assets/petty_cash/images/petty-cash.svg",
+		"title": "Petty Cash",
+		"route": "/app/petty-cash",
+		"has_permission": "petty_cash.api.has_app_permission",
+	}
+]
+
+fixtures = [{"dt": "Role", "filters": [["name", "=", "Petty Cash Custodian"]]}]
 
 # Includes in <head>
 # ------------------
@@ -261,4 +262,3 @@ app_license = "gpl-3.0"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-

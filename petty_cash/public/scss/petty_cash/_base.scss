@@ -1,0 +1,259 @@
+// Shared primitives for the petty-cash Desk page. Espresso tokens only.
+// Everything is scoped under .pc-root (page) or .pc-dialog (frappe.ui.Dialog wrapper class).
+
+.pc-root,
+.pc-dialog {
+	color: var(--ink-gray-8);
+	font-size: var(--text-base);
+
+	// core `.icon { margin: 0 auto }` centres icons inside flex rows
+	.icon {
+		margin: 0;
+	}
+
+	.pc-muted {
+		color: var(--ink-gray-5);
+		font-size: var(--text-sm);
+	}
+
+	.pc-link {
+		color: var(--ink-blue-3);
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	// White rounded card (hoteli: bg-surface-white rounded-lg border p-4)
+	.pc-card {
+		background: var(--surface-white);
+		border: 1px solid var(--outline-gray-2);
+		border-radius: var(--border-radius-lg);
+		padding: var(--padding-md, 16px);
+	}
+	.pc-card-title {
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--ink-gray-9);
+		margin-bottom: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	// Coloured callouts (hoteli: bg-surface-<c>-1 border-outline-<c>-2)
+	.pc-alert {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		border-radius: var(--border-radius-lg);
+		padding: 12px 16px;
+		border: 1px solid;
+		font-size: var(--text-sm);
+		.pc-alert-title {
+			font-weight: var(--weight-semibold);
+			font-size: var(--text-base);
+		}
+	}
+	.pc-alert-red {
+		background: var(--surface-red-1);
+		border-color: var(--outline-red-1);
+		color: var(--ink-red-4);
+	}
+	.pc-alert-amber {
+		background: var(--surface-amber-1);
+		border-color: var(--outline-amber-1);
+		color: var(--ink-amber-3);
+	}
+	.pc-alert-blue {
+		background: var(--surface-blue-1);
+		border-color: var(--outline-blue-1);
+		color: var(--ink-blue-3);
+	}
+	.pc-alert-green {
+		background: var(--surface-green-1);
+		border-color: var(--outline-green-1);
+		color: var(--ink-green-3);
+	}
+	.pc-alert-gray {
+		background: var(--surface-gray-1);
+		border-color: var(--outline-gray-2);
+		color: var(--ink-gray-7);
+	}
+
+	// Badges (frappe-ui Badge subtle theme)
+	.pc-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 1px 8px;
+		border-radius: var(--border-radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-medium);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+	.pc-badge-gray {
+		background: var(--surface-gray-2);
+		color: var(--ink-gray-7);
+	}
+	.pc-badge-blue {
+		background: var(--surface-blue-2);
+		color: var(--ink-blue-3);
+	}
+	.pc-badge-green {
+		background: var(--surface-green-2);
+		color: var(--ink-green-3);
+	}
+	.pc-badge-red {
+		background: var(--surface-red-2);
+		color: var(--ink-red-4);
+	}
+	.pc-badge-orange {
+		background: var(--surface-orange-1);
+		color: var(--ink-amber-3);
+	}
+	.pc-badge-amber {
+		background: var(--surface-amber-2);
+		color: var(--ink-amber-3);
+	}
+	.pc-badge-purple {
+		background: var(--surface-violet-1);
+		color: var(--ink-violet-1);
+	}
+
+	.pc-amount-in {
+		color: var(--ink-green-3);
+		font-weight: var(--weight-semibold);
+	}
+	.pc-amount-out {
+		color: var(--ink-red-4);
+		font-weight: var(--weight-semibold);
+	}
+
+	// List table (frappe-ui ListView look): header row with icons, hover rows
+	.pc-list {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		font-size: var(--text-sm);
+		th {
+			background: var(--surface-gray-2);
+			color: var(--ink-gray-5);
+			font-weight: var(--weight-regular);
+			text-align: left;
+			padding: 6px 10px;
+			white-space: nowrap;
+			&:first-child {
+				border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+			}
+			&:last-child {
+				border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+			}
+			.icon {
+				margin-right: 4px;
+				vertical-align: -3px;
+			}
+		}
+		td {
+			padding: 9px 10px;
+			border-bottom: 1px solid var(--outline-gray-1);
+			color: var(--ink-gray-8);
+			vertical-align: middle;
+		}
+		tbody tr:hover td {
+			background: var(--surface-gray-1);
+		}
+		tbody tr.pc-clickable {
+			cursor: pointer;
+		}
+		.text-right {
+			text-align: right;
+		}
+		.pc-truncate {
+			max-width: 320px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+	.pc-list-wrap {
+		overflow-x: auto;
+	}
+
+	.pc-pager {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding-top: 12px;
+		flex-wrap: wrap;
+	}
+	.pc-pager-buttons {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+	.pc-page-btn {
+		min-width: 28px;
+		height: 28px;
+		padding: 0 6px;
+		border: 1px solid var(--outline-gray-2);
+		background: var(--surface-white);
+		border-radius: var(--border-radius-md);
+		color: var(--ink-gray-7);
+		font-size: var(--text-sm);
+		&.active {
+			background: var(--surface-gray-7);
+			border-color: var(--surface-gray-7);
+			color: var(--ink-white, var(--surface-white));
+		}
+		&:disabled {
+			opacity: 0.4;
+			cursor: not-allowed;
+		}
+	}
+
+	.pc-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		padding: 32px 16px;
+		color: var(--ink-gray-4);
+		text-align: center;
+		.pc-empty-title {
+			color: var(--ink-gray-6);
+			font-weight: var(--weight-medium);
+		}
+	}
+
+	// Form grid for inline forms (JE / PE / replenishment request / settings)
+	.pc-form-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 0 16px;
+	}
+	.pc-section-label {
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--ink-gray-7);
+		margin: 12px 0 6px;
+	}
+
+	.pc-actions {
+		display: flex;
+		gap: 8px;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
+	.pc-spin {
+		animation: pc-spin 1s linear infinite;
+	}
+}
+
+@keyframes pc-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

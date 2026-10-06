@@ -1,0 +1,72 @@
+{
+ "doctype": "DocType",
+ "name": "Petty Cash Expense Template",
+ "module": "Petty Cash",
+ "istable": 1,
+ "engine": "InnoDB",
+ "modified": "2026-10-06 12:00:00.000000",
+ "field_order": [
+  "template_name",
+  "journal_entry_template",
+  "column_break_1",
+  "expense_category",
+  "description",
+  "section_break_accounts",
+  "debit_account",
+  "credit_account"
+ ],
+ "fields": [
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Template Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "journal_entry_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Journal Entry Template",
+   "options": "Journal Entry Template",
+   "description": "Voucher type and naming series for the posted Journal Entry"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expense_category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Expense Category",
+   "options": "\nTransport\nOffice Supplies\nCleaning Supplies\nMaintenance\nFood & Beverage\nUtilities\nMiscellaneous"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "section_break_accounts",
+   "fieldtype": "Section Break",
+   "label": "Default Accounts"
+  },
+  {
+   "fieldname": "debit_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Debit Account (Expense)",
+   "options": "Account",
+   "description": "The expense account to debit"
+  },
+  {
+   "fieldname": "credit_account",
+   "fieldtype": "Link",
+   "label": "Credit Account (Petty Cash)",
+   "options": "Account",
+   "description": "The petty cash account to credit (overrides settings default)"
+  }
+ ],
+ "permissions": []
+}
