@@ -1,8 +1,9 @@
-// Page shell, tab bar, Dashboard + Transactions tabs (hoteli List.vue / DashboardTab / TransactionsTab).
+// Page shell, tab bar, Dashboard + Transactions tabs.
+// Breakpoints follow Desk's $grid-breakpoints: sm 576px, md 768px, lg 992px.
 
 .pc-root {
 	--icon-stroke: currentColor;
-	padding: 16px 0;
+	padding: var(--padding-md) 0;
 
 	.pc-icon-wrap {
 		display: inline-flex;
@@ -13,7 +14,7 @@
 	.pc-list-card .btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
+		gap: var(--padding-xs);
 	}
 
 	// Header
@@ -21,20 +22,20 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 12px;
+		gap: var(--margin-sm);
 		flex-wrap: wrap;
-		margin-bottom: 16px;
+		margin-bottom: var(--margin-md);
 	}
 	.pc-title {
 		margin: 0;
 		font-size: var(--text-xl);
-		font-weight: var(--weight-bold);
-		color: var(--ink-gray-9);
+		font-weight: var(--weight-semibold);
+		color: var(--heading-color);
 	}
 	.pc-subtitle {
-		margin: 2px 0 0;
+		margin: var(--padding-xs) 0 0;
 		font-size: var(--text-sm);
-		color: var(--ink-gray-7);
+		color: var(--text-muted);
 	}
 
 	// Loading / error / not-configured
@@ -42,151 +43,146 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 12px;
-		padding: 48px 0;
-		color: var(--ink-gray-6);
+		gap: var(--margin-sm);
+		padding: var(--padding-2xl) 0;
+		color: var(--text-light);
 	}
 	.pc-status .pc-alert {
-		margin-bottom: 24px;
+		margin-bottom: var(--margin-lg);
 		p {
-			margin: 4px 0 0;
+			margin: var(--padding-xs) 0 0;
 		}
 	}
 	.pc-alert-actions {
-		margin-top: 12px;
-	}
-	.pc-btn-amber {
-		background: var(--amber-500);
-		border-color: transparent;
-		color: var(--neutral-white);
-		&:hover {
-			background: var(--amber-600);
-			color: var(--neutral-white);
-		}
+		margin-top: var(--margin-sm);
 	}
 
-	// Tab bar card
+	// Tab bar card (Desk .form-tabs-list look)
 	.pc-tabs-card {
-		background: var(--surface-white);
+		background: var(--card-bg);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-lg);
-		box-shadow: var(--shadow-sm);
-		margin-bottom: 16px;
+		margin-bottom: var(--margin-md);
 	}
 	.pc-tabs {
 		display: flex;
-		gap: 16px;
-		padding: 0 16px;
-		border-bottom: 1px solid var(--outline-gray-2);
+		padding: 0 var(--padding-sm);
+		border-bottom: 1px solid var(--border-color);
 		overflow-x: auto;
 	}
 	.pc-tab {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--padding-xs);
 		white-space: nowrap;
-		padding: 16px 8px;
-		margin-bottom: -1px;
+		padding: var(--margin-sm) 0;
+		margin: 0 var(--margin-sm) -1px;
 		border: 0;
-		border-bottom: 2px solid transparent;
+		border-bottom: 1px solid transparent;
 		background: none;
-		font-size: var(--text-sm);
-		font-weight: var(--weight-medium);
-		color: var(--ink-gray-6);
+		font-size: var(--text-base);
+		font-weight: var(--weight-regular);
+		color: var(--text-light);
 		&:hover {
-			color: var(--ink-gray-7);
-			border-bottom-color: var(--outline-gray-3);
+			color: var(--text-color);
 		}
 		&.active {
-			color: var(--ink-blue-3);
-			border-bottom-color: var(--ink-blue-3);
+			color: var(--text-neutral);
+			border-bottom-color: var(--text-color);
+		}
+		.indicator-pill {
+			margin: 0;
 		}
 	}
 	.pc-tab-body {
-		padding: 16px;
+		padding: var(--padding-md);
 	}
 
 	// Dashboard
 	.pc-dashboard {
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: var(--margin-lg);
 	}
 	.pc-stats,
 	.pc-quick-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 16px;
-		@media (min-width: 640px) {
+		gap: var(--margin-md);
+		@media (min-width: 576px) {
 			grid-template-columns: repeat(2, 1fr);
 		}
-		@media (min-width: 1024px) {
+		@media (min-width: 992px) {
 			grid-template-columns: repeat(3, 1fr);
 		}
 	}
+
+	// Stat cards: Desk number card; colour only on the icon chip
 	.pc-stat {
+		background: var(--card-bg);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-lg);
-		padding: 24px;
-		color: var(--neutral-white);
+		padding: var(--padding-md);
 	}
-	@each $c in "blue", "red", "green", "purple" {
-		.pc-stat-#{$c} {
-			background: linear-gradient(to bottom right, var(--#{$c}-500), var(--#{$c}-600));
-			--pc-stat-muted: var(--#{$c}-100);
+	@each $c, $surface, $ink in ("blue", "blue-2", "blue-3"), ("red", "red-2", "red-4"),
+		("green", "green-2", "green-3"), ("purple", "violet-1", "violet-1")
+	{
+		.pc-stat-#{$c} .pc-stat-icon {
+			background: var(--surface-#{$surface});
+			color: var(--ink-#{$ink});
 		}
 	}
 	.pc-stat-top {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: space-between;
+		gap: var(--margin-sm);
 	}
 	.pc-stat-label {
 		font-size: var(--text-sm);
-		color: var(--pc-stat-muted);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
 	}
 	.pc-stat-value {
-		margin-top: 4px;
-		font-size: var(--text-3xl);
-		font-weight: var(--weight-bold);
+		margin-top: var(--margin-sm);
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-semibold);
+		line-height: var(--text-line-height-3xl);
+		color: var(--text-color);
 	}
 	.pc-stat-icon {
 		display: flex;
-		padding: 12px;
+		padding: var(--padding-sm);
 		border-radius: var(--border-radius-full);
-		background: var(--white-overlay-100);
-		.icon {
-			width: 32px;
-			height: 32px;
-		}
 	}
 	.pc-stat-foot {
 		display: flex;
 		justify-content: space-between;
-		margin-top: 16px;
+		margin-top: var(--margin-sm);
 		font-size: var(--text-sm);
-		color: var(--pc-stat-muted);
+		color: var(--text-light);
 	}
 
 	.pc-quick {
-		box-shadow: var(--shadow-sm);
-		padding: 24px;
+		padding: var(--padding-lg);
 	}
 	.pc-quick-action {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 12px;
+		gap: var(--margin-sm);
 		height: 80px;
-		padding: 0 16px;
+		padding: 0 var(--padding-md);
 		text-align: left;
-		background: var(--surface-white);
-		border: 1px solid var(--outline-gray-2);
+		background: var(--control-bg);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-md);
-		color: var(--ink-gray-8);
+		color: var(--text-color);
 		&:hover {
-			background: var(--surface-gray-2);
+			background: var(--btn-default-hover-bg, var(--subtle-accent));
 		}
 		&:last-child {
-			@media (min-width: 640px) and (max-width: 1023px) {
+			@media (min-width: 576px) and (max-width: 991.98px) {
 				grid-column: span 2;
 			}
 		}
@@ -205,13 +201,13 @@
 	.pc-qa-sub {
 		display: block;
 		font-size: var(--text-xs);
-		color: var(--ink-gray-5);
+		color: var(--text-light);
 	}
 	.pc-qa-blue {
 		color: var(--ink-blue-3);
 	}
 	.pc-qa-orange {
-		color: var(--orange-600);
+		color: var(--ink-amber-3);
 	}
 	.pc-qa-red {
 		color: var(--ink-red-3);
@@ -224,44 +220,43 @@
 	.pc-list-card {
 		padding: 0;
 		overflow: hidden;
-		box-shadow: var(--shadow-sm);
 	}
 	.pc-list-head {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 12px;
+		gap: var(--margin-sm);
 		flex-wrap: wrap;
-		padding: 16px;
-		border-bottom: 1px solid var(--outline-gray-2);
+		padding: var(--padding-md);
+		border-bottom: 1px solid var(--border-color);
 		h3 {
 			margin: 0;
 			font-size: var(--text-base);
 			font-weight: var(--weight-semibold);
-			color: var(--ink-gray-9);
+			color: var(--heading-color);
 		}
 	}
 	.pc-list-head-right {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: var(--margin-sm);
 	}
 	.pc-list-body {
 		min-height: 200px;
-		padding: 8px 16px 12px;
+		padding: var(--padding-sm) var(--padding-md) var(--margin-sm);
 	}
 
 	// Transactions
 	.pc-transactions {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: var(--margin-md);
 	}
 	.pc-filters {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: flex-end;
-		gap: 16px;
+		gap: var(--margin-md);
 		.form-group {
 			margin-bottom: 0;
 		}
@@ -271,22 +266,22 @@
 	}
 	.pc-filter-buttons {
 		display: flex;
-		gap: 8px;
+		gap: var(--padding-sm);
 	}
 	.pc-select-banner {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 12px;
-		padding: 8px 16px;
-		background: var(--surface-gray-2);
-		border-bottom: 1px solid var(--outline-gray-2);
+		gap: var(--margin-sm);
+		padding: var(--padding-sm) var(--padding-md);
+		background: var(--subtle-fg);
+		border-bottom: 1px solid var(--border-color);
 		font-size: var(--text-sm);
 		font-weight: var(--weight-medium);
 	}
 	.pc-select-actions {
 		display: flex;
-		gap: 8px;
+		gap: var(--padding-sm);
 	}
 	.pc-list .pc-check-col {
 		width: 32px;
@@ -298,33 +293,33 @@
 		display: flex;
 		justify-content: space-between;
 		flex-wrap: wrap;
-		gap: 12px;
-		margin: 12px -16px 0;
-		padding: 12px 16px;
-		background: var(--surface-gray-1);
-		border-top: 1px solid var(--outline-gray-2);
-		border-bottom: 1px solid var(--outline-gray-2);
+		gap: var(--margin-sm);
+		margin: var(--margin-sm) calc(-1 * var(--padding-md)) 0;
+		padding: var(--margin-sm) var(--padding-md);
+		background: var(--subtle-fg);
+		border-top: 1px solid var(--border-color);
+		border-bottom: 1px solid var(--border-color);
 		font-size: var(--text-sm);
 	}
 	.pc-totals-amounts {
 		display: flex;
-		gap: 24px;
+		gap: var(--margin-lg);
 		flex-wrap: wrap;
 	}
 	.pc-net {
-		font-weight: var(--weight-bold);
+		font-weight: var(--weight-semibold);
 	}
 	.pc-pager-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 16px;
+		gap: var(--margin-md);
 		flex-wrap: wrap;
-		padding-top: 12px;
+		padding-top: var(--margin-sm);
 		label {
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: var(--padding-sm);
 			margin: 0;
 		}
 		select {

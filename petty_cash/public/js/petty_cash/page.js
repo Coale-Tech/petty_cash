@@ -155,7 +155,7 @@ petty_cash.PettyCashPage = class PettyCashPage {
 									"Please configure the petty cash account and imprest amount in the Settings tab to get started."
 							  )}</p>
 							<div class="pc-alert-actions">
-								<button class="btn btn-sm pc-btn-amber pc-configure">${__("Configure Settings")}</button>
+								<button class="btn btn-default btn-sm pc-configure">${__("Configure Settings")}</button>
 							</div>`
 							: ""
 					}
@@ -183,7 +183,11 @@ petty_cash.PettyCashPage = class PettyCashPage {
 					(t) => `<button class="pc-tab ${
 						t.key === this.tab ? "active" : ""
 					}" data-tab="${t.key}">
-						${icon(t.icon)}${t.label}${t.badge && counts[t.key] ? badge(String(counts[t.key]), t.badge) : ""}
+						${icon(t.icon)}${t.label}${
+						t.badge && counts[t.key]
+							? badge(String(counts[t.key]), t.badge, false)
+							: ""
+					}
 					</button>`
 				)
 				.join("")
@@ -217,7 +221,7 @@ function render_dashboard($c, ctx) {
 				<div class="pc-stat-label">${label}</div>
 				<div class="pc-stat-value">${value}</div>
 			</div>
-			<div class="pc-stat-icon">${icon(ic, "lg")}</div>
+			<div class="pc-stat-icon">${icon(ic, "md")}</div>
 		</div>
 		<div class="pc-stat-foot">${foot}</div>
 	</div>`;

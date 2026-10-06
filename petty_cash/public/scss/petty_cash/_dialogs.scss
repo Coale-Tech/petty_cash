@@ -3,7 +3,7 @@
 .pc-dialog {
 	// Spacing between stacked custom HTML blocks (empty HTML fields stay collapsed)
 	.frappe-control[data-fieldtype="HTML"] > * {
-		margin-bottom: 12px;
+		margin-bottom: var(--margin-sm);
 	}
 
 	.pc-alert .icon,
@@ -18,27 +18,27 @@
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--padding-xs);
 	}
 	.pc-row-between {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 12px;
+		gap: var(--margin-sm);
 	}
 	.pc-stack {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: var(--margin-lg);
 	}
 	.pc-stack-sm {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: var(--padding-sm);
 	}
 	.pc-grid {
 		display: grid;
-		gap: 16px;
+		gap: var(--margin-md);
 		font-size: var(--text-sm);
 	}
 	.pc-grid-2 {
@@ -50,7 +50,7 @@
 	.pc-grid-4 {
 		grid-template-columns: repeat(4, 1fr);
 	}
-	@media (max-width: 768px) {
+	@media (max-width: 767.98px) {
 		.pc-grid-3 {
 			grid-template-columns: 1fr;
 		}
@@ -60,15 +60,15 @@
 	}
 
 	.pc-mb {
-		margin-bottom: 12px;
+		margin-bottom: var(--margin-sm);
 	}
 	.pc-mt {
-		margin-top: 8px;
+		margin-top: var(--padding-sm);
 	}
 	.pc-divider-top {
-		margin-top: 12px;
-		padding-top: 12px;
-		border-top: 1px solid var(--outline-gray-2);
+		margin-top: var(--margin-sm);
+		padding-top: var(--margin-sm);
+		border-top: 1px solid var(--border-color);
 	}
 	.pc-alert .pc-divider-top {
 		border-top-color: currentColor;
@@ -97,13 +97,13 @@
 		color: var(--ink-amber-3);
 	}
 	.pc-text-gray {
-		color: var(--ink-gray-5);
+		color: var(--text-light);
 	}
 
 	.pc-stat-label {
 		font-size: var(--text-sm);
-		color: var(--ink-gray-5);
-		margin-bottom: 2px;
+		color: var(--text-light);
+		margin-bottom: var(--padding-xs);
 	}
 	.pc-alert:not(.pc-alert-gray) .pc-stat-label {
 		color: inherit;
@@ -111,43 +111,43 @@
 	}
 	.pc-value-xl {
 		font-size: var(--text-xl);
-		font-weight: var(--weight-bold);
+		font-weight: var(--weight-semibold);
 	}
 	.pc-value-2xl {
 		font-size: var(--text-2xl);
-		font-weight: var(--weight-bold);
+		font-weight: var(--weight-semibold);
 	}
 	.pc-box-title {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--padding-sm);
 		font-weight: var(--weight-semibold);
-		color: var(--ink-gray-9);
-		margin-bottom: 12px;
+		color: var(--heading-color);
+		margin-bottom: var(--margin-sm);
 	}
 	.pc-alert .pc-box-title {
 		color: inherit;
-		margin-bottom: 8px;
+		margin-bottom: var(--padding-sm);
 	}
 
-	// Tiles: gray stat boxes (hoteli bg-gray-50 rounded-lg p-4) and white sub-cards in coloured boxes
+	// Tiles: muted stat boxes and card-coloured sub-cards inside coloured boxes
 	.pc-tile {
-		background: var(--surface-gray-2);
+		background: var(--subtle-fg);
 		border-radius: var(--border-radius-lg);
-		padding: 12px 16px;
-		color: var(--ink-gray-9);
+		padding: var(--margin-sm) var(--padding-md);
+		color: var(--text-color);
 	}
 	.pc-tile-white {
-		background: var(--surface-white);
-		border: 1px solid var(--outline-gray-2);
+		background: var(--card-bg);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-md);
-		padding: 12px;
+		padding: var(--margin-sm);
 	}
 
 	.pc-field-msg {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--padding-xs);
 		font-size: var(--text-sm);
 	}
 
@@ -155,9 +155,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
-		padding: 16px 0;
-		color: var(--ink-gray-5);
+		gap: var(--padding-sm);
+		padding: var(--padding-md) 0;
+		color: var(--text-light);
 	}
 	.pc-spin {
 		display: inline-flex;
@@ -166,27 +166,27 @@
 	.pc-inline {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--padding-sm);
 		margin: 0;
-		color: var(--ink-gray-6);
+		color: var(--text-muted);
 	}
 
 	// Outstanding invoice rows
 	.pc-invoice-list {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: var(--padding-sm);
 		max-height: 240px;
 		overflow-y: auto;
 	}
 	.pc-invoice-row {
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		padding: 12px;
-		border: 1px solid var(--outline-gray-2);
+		gap: var(--margin-sm);
+		padding: var(--margin-sm);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-md);
-		background: var(--surface-gray-1);
+		background: var(--subtle-fg);
 		transition: background-color 0.15s, border-color 0.15s;
 		&.selected {
 			background: var(--surface-blue-1);
@@ -208,13 +208,13 @@
 	.pc-invoice-no {
 		font-size: var(--text-sm);
 		font-weight: var(--weight-medium);
-		color: var(--ink-blue-3);
+		color: var(--text-color);
 	}
 	.pc-invoice-amt {
 		flex-shrink: 0;
 		text-align: right;
 		font-size: var(--text-sm);
-		margin-right: 8px;
+		margin-right: var(--padding-sm);
 	}
 	.pc-alloc {
 		width: 112px;
@@ -227,7 +227,7 @@
 
 	// Bordered table wrapper for invoice items / taxes
 	.pc-table-box {
-		border: 1px solid var(--outline-gray-2);
+		border: 1px solid var(--border-color);
 		border-radius: var(--border-radius-lg);
 		overflow: hidden;
 		.pc-list th {

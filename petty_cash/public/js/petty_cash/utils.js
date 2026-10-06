@@ -23,9 +23,12 @@ export const esc = (s) => frappe.utils.escape_html(s == null ? "" : String(s));
 
 export const icon = (name, size = "sm") => frappe.utils.icon(name, size);
 
-// color: gray | blue | green | red | orange | amber | purple
-export const badge = (label, color = "gray") =>
-	`<span class="pc-badge pc-badge-${color}">${esc(label)}</span>`;
+// Desk indicator pill. color: gray | blue | green | red | orange | amber | purple | cyan
+// (amber has no indicator colour; yellow is its Espresso equivalent). dot=false for counts.
+export const badge = (label, color = "gray", dot = true) =>
+	`<span class="indicator-pill ${color === "amber" ? "yellow" : color}${
+		dot ? "" : " no-indicator-dot"
+	}">${esc(label)}</span>`;
 
 export const voucher_link = (doctype, name) =>
 	name
