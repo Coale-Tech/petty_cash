@@ -9,7 +9,7 @@ keeps a second copy of a number.
 import frappe
 from frappe import _
 from frappe.query_builder import DocType, Order
-from frappe.utils import flt, getdate, nowdate
+from frappe.utils import flt, formatdate, getdate, nowdate
 
 GLE = DocType("GL Entry")
 TEMPLATE_FIELDS = (
@@ -20,6 +20,17 @@ TEMPLATE_FIELDS = (
 	"debit_account",
 	"credit_account",
 )
+
+
+def _write_remark(je):
+	"""GL remarks = row user_remark + header remark, and v16 releases disagree on whether
+	create_remarks copies user_remark into the header (16.14 adds "Note: ...", later ones drop it).
+	Write the header remark ourselves so the GL shows the remark exactly once on any release."""
+	reference = je.cheque_no and _("Reference #{0} dated {1}").format(
+		je.cheque_no, formatdate(je.cheque_date)
+	)
+	je.remark = "\n".join(filter(None, (je.user_remark, reference)))
+	je.flags.skip_remarks_creation = True
 
 
 def _settings(require_configured=True):
@@ -177,8 +188,6 @@ def create_expense(
 			"account": debit_account,
 			"debit_in_account_currency": amount,
 			"cost_center": frappe.get_cached_value("Company", settings.company, "cost_center"),
-			# v16 create_remarks drops the header user_remark once cheque_no is set; row remarks reach the GL
-			"user_remark": je.user_remark,
 		},
 	)
 	je.append(
@@ -186,9 +195,9 @@ def create_expense(
 		{
 			"account": template.credit_account or settings.petty_cash_account,
 			"credit_in_account_currency": amount,
-			"user_remark": je.user_remark,
 		},
 	)
+	_write_remark(je)
 	je.insert()
 	je.submit()
 	return {"success": True, "journal_entry": je.name}
@@ -226,10 +235,9 @@ def replenish_petty_cash(
 
 	je = _replenishment_je(settings, settings.petty_cash_account, bank_account, amount, posting_date)
 	je.user_remark = _("Petty cash replenishment to imprest level")
-	for row in je.accounts:
-		row.user_remark = je.user_remark
 	if reference_no:
 		je.cheque_no = reference_no
+	_write_remark(je)
 	je.insert()
 	je.submit()
 	return {
@@ -529,10 +537,10 @@ def create_journal_entry(data: str | dict):
 						"reference_name",
 					)
 				},
-				# GL remarks come from row user_remark (+ cheque reference); the header remark never reaches it
-				"user_remark": row.get("user_remark") or je.user_remark,
+				"user_remark": row.get("user_remark"),
 			},
 		)
+	_write_remark(je)
 	je.insert()
 	je.submit()
 	return {"success": True, "data": {"name": je.name}}
