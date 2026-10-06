@@ -59,7 +59,9 @@ Requires `erpnext`.
 - Report **Customer Statement** (Selling sidebar, after Customer Credit Balance; also **View -> Customer Statement**
   on the Customer form): opening balance, invoices/payments/returns with running balance, ageing.
 - **Statement PDF** renders the `Customer Statement` print format (Chrome PDF generator) with the issuer's logo,
-  tax ID and contacts from the Company and the first company Bank Account as payment details.
+  address, tax ID and contacts from the Company and the first company Bank Account as payment details.
+  Styled on Espresso tokens (`print.bundle.css` variables, Inter) with a running head and paged footer; layout
+  borrowed from vigilant's statement (itself adapted from kimzone).
 
 #### Notes
 

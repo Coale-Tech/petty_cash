@@ -1,9 +1,12 @@
-{#- Customer Statement — issuer + title head, three info boxes, flat ledger, ageing beside payment
-    details, closing note; same layout and print palette as the raven (coaletecherp) statement, with the
-    issuer's logo, tax ID and contacts taken from the Company instead of hardcoded branding.
-    Rendered as a Jinja print format on Customer; period and company arrive as URL params
-    (from_date / to_date / company) from the Customer Statement report's "Statement PDF" button.
-    Default: last 3 months. -#}
+{#- Customer Statement — Espresso (Frappe v16 design system) print format.
+    Layout lineage: kimzone -> vigilant -> raven statement (issuer head, three info boxes, flat ledger,
+    ageing beside payment details, closing note); company identity block borrowed from vigilant's
+    ds_company.html (logo, address via Dynamic Link, contacts, tax ID).
+    Styling uses only Espresso CSS variables, which frappe's print.bundle.css defines for both the
+    printview and the Chrome PDF; Inter is loaded from frappe's own assets (the Chrome generator serves
+    /assets locally).
+    Period and company arrive as URL params (from_date / to_date / company) from the Customer Statement
+    report's "Statement PDF" button. Default: last 3 months. -#}
 {% set st = get_statement(
     customer=doc.name,
     company=frappe.form_dict.company,
@@ -11,49 +14,42 @@
     to_date=frappe.form_dict.to_date) %}
 {% set co = frappe.db.get_value("Company", st.company,
     ["company_logo", "tax_id", "phone_no", "email", "website"], as_dict=True) %}
+{% set co_addresses = frappe.get_all("Address",
+    filters=[["Dynamic Link", "link_doctype", "=", "Company"], ["Dynamic Link", "link_name", "=", st.company]],
+    fields=["address_line1", "address_line2", "city", "pincode"],
+    order_by="is_primary_address desc, creation asc",
+    limit_page_length=1) %}
+{% set co_address = co_addresses[0] if co_addresses else none %}
 {% set money = frappe.utils.fmt_money %}
 {% set fmt_date = frappe.utils.formatdate %}
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
-
-:root {
-  --charcoal:        #1A1A1A;
-  --charcoal-light:  #4A4A4A;
-  --charcoal-lighter:#6A6A6A;
-  --stonegrey:       #B8B8B8;
-  --parchment:       #FAF8F2;
-  --gold:            #E8C547;
-  --gold-subtle:     #FCF8EA;
-  --gold-border:     #F1E3A0;
-  --border:          #E5E5E5;
-  --white:           #FFFFFF;
-
-  --sans:    "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --display: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
-  --mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
-}
-
+/* Inside the <style> (not a <link>) so it also reaches the Chrome header/footer band documents,
+   which receive the page's <head> and <style> tags only. */
+@import url("/assets/frappe/css/fonts/inter/inter.css");
 *, *::before, *::after { box-sizing: border-box; }
-html, body {
-  font-family: var(--sans);
-  font-size: 10px;
+html, body, .print-format {
+  font-family: var(--font-stack);
+  font-size: var(--text-sm);
   line-height: 1.5;
-  color: var(--charcoal);
+  color: var(--text-color);
+  /* Chrome emits opsz-varied Inter instances as Type 3 fonts that ignore the fill colour (prints black). */
+  font-optical-sizing: none;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
-.inv p { margin: 1px 0; }
+.st p { margin: 0; }
 
-/* Brand bar + running head, stamped on every page (#header-html) */
-.ct-bar { height: 3px; background: linear-gradient(90deg, var(--charcoal) 0 50%, var(--stonegrey) 50% 100%); }
+/* Running head, stamped on every page (#header-html) */
 .rh-line {
-  display: table; width: 100%; margin-top: 2mm;
-  font-family: var(--mono); font-size: 7.5px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--charcoal-lighter);
+  display: table; width: 100%; padding-bottom: var(--padding-xs);
+  border-bottom: 1px solid var(--border-color);
+  font-size: var(--text-tiny); color: var(--text-light);
 }
 .rh-line .rh-l, .rh-line .rh-r { display: table-cell; vertical-align: bottom; }
-.rh-line .rh-r { text-align: right; color: var(--charcoal); }
+/* Chrome band documents print inherited text black, so every text element sets its own colour. */
+.rh-line .rh-l { color: var(--text-light); }
+.rh-line .rh-r { text-align: right; color: var(--text-muted); font-weight: var(--weight-medium); }
 
 /* Page geometry — A4, 10mm sides/top, 16mm bottom (the footer band).
    frappe.utils.pdf.get_print_format_styles() only harvests a BARE `.print-format` rule and feeds
@@ -61,14 +57,14 @@ html, body {
    because the footer band IS the bottom margin. The compound selector keeps the element flush. */
 .print-format { margin-top: 10mm; margin-left: 10mm; margin-right: 10mm; }
 html body .print-format { margin: 0 !important; }
-.inv { max-width: 190mm; margin: 0 auto; }
+.st { max-width: 190mm; margin: 0 auto; }
 
 /* PDF bands: each band is its own Chrome document; zero the injected padding and pin whole-px
    heights so a band never fragments onto a 2nd page (which pdf_merge would stamp a page late). */
 body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
 .print-format > .wrapper { padding: 0 !important; }
-.print-format > .wrapper:has(> .ct-bar) { height: 26px !important; overflow: hidden; }
-.print-format > .wrapper:has(> .ft-rule) { height: 60px !important; padding: 0 0 13px !important; overflow: hidden; }
+.print-format > .wrapper:has(> .rh-line) { height: 26px !important; padding-top: 8px !important; overflow: hidden; }
+.print-format > .wrapper:has(> .ft-grid) { height: 60px !important; padding: 0 0 13px !important; overflow: hidden; }
 
 /* Browser print / Desk preview: no per-page bands, so pad the sheet and drop the footer to the bottom. */
 @page { size: A4; }
@@ -77,95 +73,107 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
   min-height: calc(100vh - 62px);
   padding: 9mm 10mm !important;
 }
-.print-format:has(#footer-html) > #header-html { margin-bottom: 5mm; }
-.print-format:has(#footer-html) > #footer-html { margin-top: auto !important; padding-top: 6mm; }
+.print-format:has(#footer-html) > #header-html { margin-bottom: var(--margin-md); }
+.print-format:has(#footer-html) > #footer-html { margin-top: auto !important; padding-top: var(--margin-lg); }
 
-.ft-rule { height: 2px; background: linear-gradient(90deg, var(--charcoal) 0 50%, var(--stonegrey) 50% 100%); margin-bottom: 3px; }
-.ft-grid { display: table; width: 100%; }
-.ft-l, .ft-r { display: table-cell; vertical-align: top; font-size: 8.5px; color: var(--charcoal-light); }
+.ft-grid {
+  display: table; width: 100%; padding-top: var(--padding-xs);
+  border-top: 1px solid var(--border-color);
+}
+.ft-l, .ft-r { display: table-cell; vertical-align: top; font-size: var(--text-tiny); color: var(--text-muted); }
 .ft-r { text-align: right; }
-.ft-l p, .ft-r p { margin: 1px 0; }
-.ft-r a { color: var(--charcoal-light); text-decoration: none; }
-.ft-label { font-family: var(--mono); font-size: 7px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--stonegrey); }
-.ft-page { font-family: var(--mono); font-size: 7.5px; color: var(--stonegrey); }
+.ft-r a, .ft-grid p { color: var(--text-muted); text-decoration: none; }
+.ft-grid .ft-page, .ft-page span { color: var(--text-light); }
 .print-format:has(#footer-html) .ft-page { display: none; }
 
 /* Statement */
 .st-layout { width: 100%; border-collapse: collapse; }
-.st-layout > tbody > tr > td { padding: 0; vertical-align: top; border: 0; }
+/* standard.css sets `.print-format td { padding: 6px !important }`; layout cells must stay flush. */
+.st-layout > tbody > tr > td { padding: 0 !important; vertical-align: top; border: 0; }
 
-.st-head { border-bottom: 2px solid var(--gold); padding-bottom: 3mm; margin-bottom: 4mm; }
-.st-issuer { width: 60%; vertical-align: middle !important; }
-.st-logo { display: block; max-height: 14mm; max-width: 50mm; width: auto; height: auto; margin-bottom: 1.5mm; }
-.st-issuer-name { font-family: var(--display); font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
-.st-issuer-pin { font-family: var(--mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--charcoal-light); }
-.st-title-cell { width: 40%; text-align: right; vertical-align: middle !important; }
-.st-title { font-family: var(--display); font-size: 19px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; text-transform: uppercase; }
-.st-subtitle { font-family: var(--mono); font-size: 9px; color: var(--charcoal-lighter); margin-top: 1mm; }
+.st-head { padding-bottom: var(--padding-md); margin-bottom: var(--margin-md); border-bottom: 1px solid var(--border-color); }
+.st-issuer { width: 60%; }
+.st-logo { display: block; max-height: 14mm; max-width: 50mm; width: auto; height: auto; margin-bottom: var(--padding-sm); }
+.st-issuer-name { font-size: var(--text-lg); font-weight: var(--weight-semibold); color: var(--heading-color); }
+.st-issuer-line { font-size: var(--text-xs); color: var(--text-muted); }
+.st-title-cell { width: 40%; text-align: right; }
+.st-title { font-size: var(--text-2xl); font-weight: var(--weight-semibold); color: var(--heading-color); line-height: 1.2; }
+.st-subtitle { font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--padding-xs); }
 
-.st-boxes { margin-bottom: 5mm; }
-.st-box-cell { width: 33.33%; padding-right: 3mm !important; }
-.st-box-cell:last-child { padding-right: 0 !important; }
-.st-box { background: var(--parchment); border-left: 3px solid var(--gold); padding: 2mm 3mm; height: 100%; }
-.st-box-due { background: var(--charcoal); border-left-color: var(--gold); color: var(--white); text-align: right; }
-.st-box-title, .st-tag {
-  font-family: var(--mono); font-size: 7.5px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.12em; color: var(--charcoal-lighter);
+.st-boxes { margin-bottom: var(--margin-md); }
+.st-layout td.st-box-cell { width: 33.33%; padding-right: var(--padding-sm) !important; }
+.st-layout td.st-box-cell:last-child { padding-right: 0 !important; }
+.st-box {
+  height: 100%; padding: var(--padding-sm) var(--padding-md);
+  background: var(--surface-gray-1); border: 1px solid var(--border-color); border-radius: var(--border-radius-md);
 }
-.st-box-due .st-box-title { color: var(--stonegrey); }
-.st-box-body { margin-top: 0.5mm; font-size: 9.5px; }
-.st-due-amount { font-family: var(--mono); font-size: 16px; font-weight: 700; margin-top: 1mm; white-space: nowrap; }
+.st-box-due { background: var(--surface-gray-2); text-align: right; }
+.st-box-title, .st-tag { font-size: var(--text-tiny); font-weight: var(--weight-medium); color: var(--text-light); }
+.st-box-body { margin-top: var(--padding-xs); font-size: var(--text-xs); }
+.st-box-body strong { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--heading-color); }
+.st-due-amount {
+  margin-top: var(--padding-xs); white-space: nowrap; font-variant-numeric: tabular-nums;
+  font-size: var(--text-xl); font-weight: var(--weight-semibold); color: var(--heading-color);
+}
 
 .st-ledger, .st-aging { width: 100%; border-collapse: collapse; }
-.st-ledger th, .st-ledger td, .st-aging th, .st-aging td, .st-pay td {
-  padding: 5px 6px !important; border: 0; border-bottom: 1px solid var(--border); font-size: 9.5px;
+.st-ledger th, .st-ledger td, .st-aging th, .st-aging td {
+  padding: var(--padding-xs) var(--padding-sm) !important; border: 0; border-bottom: 1px solid var(--border-color);
+  font-size: var(--text-xs);
 }
 .st-ledger thead { display: table-header-group; }
 .st-ledger tbody tr { page-break-inside: avoid; }
-.st-ledger thead th {
-  font-family: var(--mono); font-size: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--white); background: var(--charcoal) !important; text-align: left;
+/* Print Settings injects `.print-format th { background-color: … !important }` after this block. */
+.st-ledger thead th, .st-aging thead th {
+  background: var(--subtle-fg) !important; color: var(--text-muted);
+  font-size: var(--text-tiny); font-weight: var(--weight-medium); text-align: left;
 }
-.st-num { text-align: right !important; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st-num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .st-nw { white-space: nowrap; }
-.st-ref { font-family: var(--mono); font-size: 8.5px; color: var(--charcoal-light); }
-.st-balance { font-weight: 600; }
-.st-ledger tr.st-edge td { font-weight: 700; background: var(--gold-subtle); border-bottom-color: var(--gold-border); }
+.st-ref { color: var(--text-muted); }
+.st-balance { font-weight: var(--weight-medium); color: var(--heading-color); }
+.st-ledger tr.st-edge td { background: var(--surface-gray-1); font-weight: var(--weight-semibold); color: var(--heading-color); }
 
-.st-bottom { margin-top: 6mm; page-break-inside: avoid; }
-.st-aging-wrap { width: 62%; padding-right: 4mm !important; }
+.st-bottom { margin-top: var(--margin-lg); page-break-inside: avoid; }
+.st-layout td.st-aging-wrap { width: 62%; padding-right: var(--margin-md) !important; }
 .st-pay-wrap { width: 38%; }
 .st-section {
-  font-family: var(--mono); font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
-  padding-bottom: 1mm; margin-bottom: 2mm; border-bottom: 2px solid var(--gold);
+  margin-bottom: var(--padding-sm); font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--heading-color);
 }
-.st-aging thead th {
-  background: var(--parchment) !important; color: var(--charcoal-light); text-align: right;
-  font-family: var(--mono); font-size: 7.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-}
-.st-aging-total { font-weight: 700; border-left: 1px solid var(--border); }
-.st-pay td { padding: 2px 4px !important; border: 0; }
-.st-pay .st-k { font-family: var(--mono); font-size: 8px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--charcoal-lighter); white-space: nowrap; }
+.st-aging thead th { text-align: right; }
+.st-aging-total { font-weight: var(--weight-semibold); color: var(--heading-color); }
+.st-pay td { padding: var(--padding-xs) 0 !important; border: 0; font-size: var(--text-xs); }
+.st-pay .st-k { padding-right: var(--padding-md) !important; color: var(--text-light); white-space: nowrap; }
 
-.st-note { margin-top: 5mm; padding-top: 2mm; border-top: 1px solid var(--border); font-size: 9px; color: var(--charcoal-light); }
+.st-note {
+  margin-top: var(--margin-lg); padding-top: var(--padding-sm); border-top: 1px solid var(--border-color);
+  font-size: var(--text-xs); color: var(--text-muted);
+}
 </style>
 
 <div id="header-html">
-  <div class="ct-bar"></div>
   <div class="rh-line">
     <span class="rh-l">{{ st.company }}</span>
-    <span class="rh-r">{{ _("Customer Statement") }} {{ doc.name }}</span>
+    <span class="rh-r">{{ _("Customer Statement") }} · {{ doc.name }}</span>
   </div>
 </div>
 
-<div class="inv st">
+<div class="st">
 
   <div class="st-head">
     <table class="st-layout"><tr>
       <td class="st-issuer">
         {% if co.company_logo %}<img class="st-logo" src="{{ co.company_logo }}" alt="{{ st.company }}">{% endif %}
         <div class="st-issuer-name">{{ st.company }}</div>
-        {% if co.tax_id %}<div class="st-issuer-pin">{{ _("Tax ID") }} {{ co.tax_id }}</div>{% endif %}
+        {% if co_address %}
+          {% set line1 = [co_address.address_line1, co_address.address_line2] | select | join(", ") %}
+          {% set line2 = [co_address.city, co_address.pincode] | select | join(" ") %}
+          {% if line1 %}<div class="st-issuer-line">{{ line1 }}</div>{% endif %}
+          {% if line2 %}<div class="st-issuer-line">{{ line2 }}</div>{% endif %}
+        {% endif %}
+        {% set contact = [co.phone_no, co.email] | select | join(" · ") %}
+        {% if contact %}<div class="st-issuer-line">{{ contact }}</div>{% endif %}
+        {% if co.tax_id %}<div class="st-issuer-line">{{ _("Tax ID") }}: {{ co.tax_id }}</div>{% endif %}
       </td>
       <td class="st-title-cell">
         <div class="st-title">{{ _("Statement of Account") }}</div>
@@ -181,7 +189,7 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
           <div class="st-box-title">{{ _("Customer") }}</div>
           <div class="st-box-body">
             <strong>{{ st.party.customer_name }}</strong>
-            {% if st.party.tax_id %}<div><span class="st-tag">{{ _("PIN") }}</span> {{ st.party.tax_id }}</div>{% endif %}
+            {% if st.party.tax_id %}<div><span class="st-tag">{{ _("Tax ID") }}</span> {{ st.party.tax_id }}</div>{% endif %}
             {% if st.party.mobile_no %}<div><span class="st-tag">{{ _("Tel") }}</span> {{ st.party.mobile_no }}</div>{% endif %}
             {% if st.party.email_id %}<div><span class="st-tag">{{ _("Email") }}</span> {{ st.party.email_id }}</div>{% endif %}
           </div>
@@ -234,7 +242,7 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
         <thead>
           <tr>
             <th>{{ _("0-30 Days") }}</th><th>{{ _("31-60 Days") }}</th><th>{{ _("61-90 Days") }}</th><th>{{ _("91+ Days") }}</th>
-            <th>{{ _("Credits on Account") }}</th><th class="st-aging-total">{{ _("Total Due") }}</th>
+            <th>{{ _("Credits on Account") }}</th><th>{{ _("Total Due") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -271,20 +279,18 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
 </div>
 
 <div id="footer-html">
-  <div class="ft-rule"></div>
   <div class="ft-grid">
     <div class="ft-l">
-      <p class="ft-label">{{ _("Statement") }}</p>
       <p>{% if co.email %}{{ _("Please settle the balance due and send remittance advice to {0}.").format(co.email) }}{% else %}{{ _("Please settle the balance due.") }}{% endif %}</p>
     </div>
     <div class="ft-r">
-      <p>{{ [co.phone_no, co.email] | select | join(" · ") }}</p>
-      {% if co.website %}<p><a href="{{ co.website }}">{{ co.website }}</a></p>{% endif %}
+      <p>{{ [co.phone_no, co.website] | select | join(" · ") }}</p>
       <p class="ft-page">{{ _("Page") }} <span class="page">1</span> {{ _("of") }} <span class="topage">1</span></p>
     </div>
   </div>
   <script>
-    /* Stamps the page number on every page of the Chrome footer band. */
+    /* Stamps the page number on every page of the Chrome footer band (browser.py calls this once the
+       body page count is known; upstream ships it in print_designer, not installed here). */
     function clone_and_update(selector, total_pages, is_print_designer, type, update) {
       const first = document.querySelector(selector);
       if (!first || !total_pages) return Promise.resolve(0);
