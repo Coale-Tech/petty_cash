@@ -1,0 +1,90 @@
+// Select Items dialog (item_picker.bundle.js). Espresso tokens only; every class is
+// prefixed pc-ip so nothing leaks into other dialogs.
+
+.pc-ip-row {
+	display: flex;
+	align-items: center;
+	gap: var(--margin-lg);
+	margin-top: var(--margin-xs);
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: var(--padding-xs);
+		margin: 0;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	input[type="radio"],
+	input[type="checkbox"] {
+		margin: 0;
+	}
+}
+
+.pc-ip-table-container {
+	width: 100%;
+	max-height: 60vh;
+	overflow: auto;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md);
+}
+
+.pc-ip-table {
+	width: 100%;
+	min-width: var(--pc-ip-min-width);
+	border-collapse: collapse;
+	table-layout: fixed;
+
+	th,
+	td {
+		position: relative;
+		width: 100px;
+		min-width: 60px;
+		max-width: 500px;
+		padding: var(--padding-xs) var(--padding-sm);
+		border: 1px solid var(--border-color);
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	th {
+		position: sticky;
+		top: 0;
+		z-index: 3;
+		background-color: var(--subtle-fg);
+		font-weight: var(--weight-semibold);
+	}
+
+	.pc-ip-pick-col {
+		width: 50px;
+	}
+
+	.pc-ip-qty {
+		width: 80px;
+		border: none;
+		outline: none;
+		background: transparent;
+		color: var(--text-color);
+	}
+}
+
+.pc-ip-resizer {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 10;
+	width: 5px;
+	height: 100%;
+	cursor: col-resize;
+	user-select: none;
+}
+
+.pc-ip-item-row {
+	cursor: pointer;
+
+	&:hover {
+		background-color: var(--subtle-accent);
+	}
+}
