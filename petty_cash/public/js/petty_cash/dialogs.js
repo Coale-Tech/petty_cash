@@ -163,6 +163,14 @@ export function open_expense_dialog(ctx) {
 				onchange: render,
 			},
 			{
+				fieldtype: "Link",
+				fieldname: "cost_center",
+				options: "Cost Center",
+				label: __("Cost Center"),
+				default: db.cost_center,
+				get_query: () => ({ filters: { company: db.company, is_group: 0 } }),
+			},
+			{
 				fieldtype: "Data",
 				fieldname: "receipt_reference",
 				label: require_receipt
@@ -192,6 +200,7 @@ export function open_expense_dialog(ctx) {
 						amount: v.amount,
 						posting_date: v.posting_date,
 						receipt_reference: v.receipt_reference,
+						cost_center: v.cost_center,
 						description: v.description,
 					}),
 				(r) =>

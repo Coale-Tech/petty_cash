@@ -43,6 +43,20 @@ def _float(petty_cash_float, ptype="read"):
 	return doc
 
 
+def _cost_center(settings, cost_center):
+	"""Cost centre to charge: the float's own, or another non-group one of the same company
+	that the user may read (Cost Center User Permissions apply)."""
+	if not cost_center or cost_center == settings.cost_center:
+		return settings.cost_center
+	company, is_group = frappe.db.get_value("Cost Center", cost_center, ["company", "is_group"]) or (None, 0)
+	if company != settings.company or is_group:
+		frappe.throw(
+			_("Cost Center {0} must be a non-group cost centre of {1}").format(cost_center, settings.company)
+		)
+	frappe.has_permission("Cost Center", "read", cost_center, throw=True)
+	return cost_center
+
+
 def _gl_rows(account, criterion=None, limit=20):
 	"""Non-cancelled GL rows on the petty cash account, newest first; ``limit=0`` = all."""
 	query = (
@@ -152,10 +166,12 @@ def create_expense(
 	posting_date: str | None = None,
 	description: str | None = None,
 	receipt_reference: str | None = None,
+	cost_center: str | None = None,
 ):
 	"""Direct expense: Journal Entry debiting the template's expense account, crediting petty cash."""
 	frappe.has_permission("Journal Entry", "submit", throw=True)
 	settings = _float(petty_cash_float)
+	cost_center = _cost_center(settings, cost_center)
 	amount = flt(amount)
 	if amount <= 0:
 		frappe.throw(_("Amount must be greater than zero"))
@@ -199,7 +215,7 @@ def create_expense(
 		{
 			"account": debit_account,
 			"debit_in_account_currency": amount,
-			"cost_center": settings.cost_center,
+			"cost_center": cost_center,
 		},
 	)
 	je.append(
@@ -207,7 +223,7 @@ def create_expense(
 		{
 			"account": template.credit_account or settings.petty_cash_account,
 			"credit_in_account_currency": amount,
-			"cost_center": settings.cost_center,
+			"cost_center": cost_center,
 		},
 	)
 	_write_remark(je)
@@ -525,11 +541,14 @@ def get_replenishment_requests(petty_cash_float: str, limit: int = 50):
 
 
 @frappe.whitelist(methods=["POST"])
-def create_journal_entry(data: str | dict):
+def create_journal_entry(data: str | dict, petty_cash_float: str):
+	"""Journal Entry against a float: posted in the float's company, and it must touch the float's
+	petty cash account. Every account and cost centre has to belong to that company."""
 	frappe.has_permission("Journal Entry", "submit", throw=True)
 	data = frappe._dict(frappe.parse_json(data))
+	settings = _float(petty_cash_float)
 	je = frappe.new_doc("Journal Entry")
-	je.company = data.company
+	je.company = settings.company
 	je.voucher_type = data.voucher_type or "Journal Entry"
 	je.posting_date = getdate(data.posting_date) if data.posting_date else nowdate()
 	je.title = data.title or None
@@ -556,6 +575,13 @@ def create_journal_entry(data: str | dict):
 				"user_remark": row.get("user_remark"),
 			},
 		)
+	if settings.petty_cash_account not in {row.account for row in je.accounts}:
+		frappe.throw(_("A petty cash entry must include account {0}").format(settings.petty_cash_account))
+	for row in je.accounts:
+		if frappe.db.get_value("Account", row.account, "company") != settings.company:
+			frappe.throw(_("Account {0} does not belong to company {1}").format(row.account, settings.company))
+		if row.cost_center:
+			_cost_center(settings, row.cost_center)
 	_write_remark(je)
 	je.insert()
 	je.submit()

@@ -17,9 +17,15 @@ account). The page header has a float selector; every voucher row it creates car
 | Replenishments | Replenishment requests (draft Bank Entries for the Accounts Manager to submit) |
 | Settings | The selected float: cost centre, imprest amount, trigger, accounts, expense templates, controls; **New Float** |
 
+Multi-company and multi-cost-centre rules:
+
+- A float belongs to one company (taken from its cost centre); its accounts must be that company's. Every voucher is posted in that company.
+- One float per cost centre, each with its own cash account (the account is unique, and the balance is the GL balance of that account).
+- The Journal Entries tab posts in the float's company, must include the float's petty cash account, and rejects accounts or cost centres of another company.
+
 Quick actions:
 
-- **Record Expense** - submits a Cash Entry Journal Entry from an expense template (debit the template's expense account, credit petty cash)
+- **Record Expense** - submits a Cash Entry Journal Entry from an expense template (debit the template's expense account, credit petty cash). The Cost Center field defaults to the float's own; pick another non-group cost centre of the same company to charge a shared cash box to a different cost centre
 - **Pay Supplier** - submits a Payment Entry from petty cash, allocated against the supplier's outstanding Purchase Invoices
 - **Replenish Cash** - submits a Bank Entry from the replenishment bank account back up to the imprest amount
 

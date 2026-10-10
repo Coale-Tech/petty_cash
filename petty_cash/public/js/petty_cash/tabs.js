@@ -352,6 +352,7 @@ export function render_journal_entry_tab($c, ctx) {
 				label: __("Company"),
 				reqd: 1,
 				default: ctx.dashboard?.company,
+				read_only: 1,
 			},
 			{
 				fieldname: "posting_date",
