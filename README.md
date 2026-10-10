@@ -1,6 +1,6 @@
 ### Petty Cash
 
-Imprest-style petty cash console for ERPNext v16, as a single Desk page (`/app/petty-cash`).
+Imprest-style petty cash console for ERPNext v16, as a single Desk page (`/desk/petty-cash`).
 Every money movement is a native ERPNext voucher; the balance is the GL balance of the
 petty cash account (`erpnext.accounts.utils.get_balance_on`), so nothing keeps a second copy
 of a number.
@@ -37,7 +37,7 @@ Requires `erpnext`.
 #### Configure
 
 1. Create a non-group **Cash** account per float (e.g. `Petty Cash - Main - ABBR` under `Cash In Hand`).
-2. Open **Petty Cash -> Settings** (or `/app/petty-cash-float/new`), pick the cost centre, petty cash account,
+2. Open **Petty Cash -> Settings** (or `/desk/petty-cash-float/new`), pick the cost centre, petty cash account,
    replenishment bank account, imprest amount and trigger, then save. Repeat with **New Float** for each cost centre.
    Saving with a company and an empty template table seeds six expense templates (Fuel & Transport, Airtime & Data,
    Office Supplies, Cleaning & Consumables, Repairs & Maintenance, Miscellaneous) mapped to the standard
@@ -56,7 +56,7 @@ Requires `erpnext`.
 
 #### Customer Statement
 
-- Report **Customer Statement** (Selling sidebar, after Customer Credit Balance; also **View -> Customer Statement**
+- Report **Customer Statement** (Selling sidebar; also **View -> Customer Statement**
   on the Customer form): opening balance, invoices/payments/returns with running balance, ageing.
 - **Statement PDF** renders the `Customer Statement` print format (Chrome PDF generator) with the issuer's logo,
   address, tax ID and contacts from the Company and the first company Bank Account as payment details.

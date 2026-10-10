@@ -74,34 +74,34 @@
 	.pc-swatch {
 		width: 12px;
 		height: 12px;
-		border-radius: var(--border-radius-tiny);
+		border-radius: var(--radius-sm);
 	}
 	.pc-swatch-debit {
-		background: var(--ink-blue-2);
+		background: var(--ink-blue-6);
 	}
 	.pc-swatch-credit {
-		background: var(--ink-green-2);
+		background: var(--ink-green-6);
 	}
 	.pc-legend-warn {
 		margin-left: var(--padding-sm);
 		font-size: var(--text-xs);
-		color: var(--ink-amber-3);
+		color: var(--ink-amber-7);
 	}
 
 	.pc-entry-block {
 		padding: var(--padding-md);
 		background: var(--subtle-fg);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		border-left: 4px solid;
 		& + .pc-entry-block {
 			margin-top: var(--margin-md);
 		}
 	}
 	.pc-entry-debit {
-		border-left-color: var(--ink-blue-2);
+		border-left-color: var(--ink-blue-6);
 	}
 	.pc-entry-credit {
-		border-left-color: var(--ink-green-2);
+		border-left-color: var(--ink-green-6);
 	}
 	.pc-entry-title {
 		font-size: var(--text-sm);
@@ -116,7 +116,7 @@
 		gap: var(--padding-sm);
 		margin-top: var(--margin-md);
 		padding: var(--margin-sm);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		font-size: var(--text-sm);
 		font-weight: var(--weight-medium);
 	}
@@ -126,11 +126,11 @@
 	}
 	.pc-balance-balanced {
 		background: var(--surface-green-2);
-		color: var(--ink-green-3);
+		color: var(--ink-green-7);
 	}
 	.pc-balance-unbalanced {
 		background: var(--surface-red-2);
-		color: var(--ink-red-4);
+		color: var(--ink-red-7);
 	}
 
 	.pc-form-actions {
@@ -181,8 +181,8 @@
 		padding: var(--padding-lg);
 		background: var(--surface-blue-1);
 		border: 1px solid var(--outline-blue-1);
-		border-radius: var(--border-radius-lg);
-		color: var(--ink-blue-3);
+		border-radius: var(--radius-lg);
+		color: var(--ink-blue-7);
 		p {
 			margin: var(--padding-xs) 0 var(--margin-md);
 		}
@@ -190,7 +190,7 @@
 	.pc-setup-icon {
 		display: flex;
 		padding: var(--margin-sm);
-		border-radius: var(--border-radius-full);
+		border-radius: var(--radius-full);
 		background: var(--surface-blue-2);
 	}
 	.pc-setup-title {
@@ -212,7 +212,7 @@
 	.pc-section-card {
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 	}
 	.pc-section-head {
 		display: flex;
@@ -260,7 +260,7 @@
 		width: 64px;
 		height: 64px;
 		margin-bottom: var(--margin-md);
-		border-radius: var(--border-radius-full);
+		border-radius: var(--radius-full);
 		background: var(--subtle-fg);
 		color: var(--text-light);
 	}
@@ -278,13 +278,13 @@
 		padding: var(--padding-xs);
 		border: 0;
 		background: transparent;
-		border-radius: var(--border-radius-md);
+		border-radius: var(--radius-md);
 		color: var(--text-light);
 		&:hover {
 			background: var(--subtle-accent);
 		}
 		&.pc-danger {
-			color: var(--ink-red-4);
+			color: var(--ink-red-7);
 		}
 	}
 }

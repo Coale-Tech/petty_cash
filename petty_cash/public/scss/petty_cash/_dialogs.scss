@@ -6,7 +6,6 @@
 		margin-bottom: var(--margin-sm);
 	}
 
-	.pc-alert .icon,
 	.pc-field-msg .icon,
 	.pc-box-title .icon {
 		stroke: currentColor;
@@ -85,16 +84,16 @@
 		word-break: break-all;
 	}
 	.pc-text-red {
-		color: var(--ink-red-4);
+		color: var(--ink-red-7);
 	}
 	.pc-text-green {
-		color: var(--ink-green-3);
+		color: var(--ink-green-7);
 	}
 	.pc-text-blue {
-		color: var(--ink-blue-3);
+		color: var(--ink-blue-7);
 	}
 	.pc-text-orange {
-		color: var(--ink-amber-3);
+		color: var(--ink-amber-7);
 	}
 	.pc-text-gray {
 		color: var(--text-light);
@@ -133,14 +132,14 @@
 	// Tiles: muted stat boxes and card-coloured sub-cards inside coloured boxes
 	.pc-tile {
 		background: var(--subtle-fg);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		padding: var(--margin-sm) var(--padding-md);
 		color: var(--text-color);
 	}
 	.pc-tile-white {
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-md);
+		border-radius: var(--radius-md);
 		padding: var(--margin-sm);
 	}
 
@@ -185,7 +184,7 @@
 		gap: var(--margin-sm);
 		padding: var(--margin-sm);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-md);
+		border-radius: var(--radius-md);
 		background: var(--subtle-fg);
 		transition: background-color 0.15s, border-color 0.15s;
 		&.selected {
@@ -228,7 +227,7 @@
 	// Bordered table wrapper for invoice items / taxes
 	.pc-table-box {
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		overflow: hidden;
 		.pc-list th {
 			border-radius: 0;

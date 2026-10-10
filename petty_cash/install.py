@@ -1,28 +1,17 @@
-import frappe
+from frappe.desk.doctype.custom_sidebar.custom_sidebar import add_site_sidebar_item
 
 
 def add_customer_statement_to_selling_sidebar():
-	"""Selling's sidebar is a standard erpnext record that every migrate re-syncs from its JSON,
-	so the Customer Statement link is re-added (after Customer Credit Balance) after each migrate."""
-	if not frappe.db.exists("Report", "Customer Statement") or not frappe.db.exists(
-		"Workspace Sidebar", "Selling"
-	):
-		return
-	doc = frappe.get_doc("Workspace Sidebar", "Selling")
-	if any(i.link_to == "Customer Statement" for i in doc.items):
-		return
-	pos = next((i.idx for i in doc.items if i.label == "Customer Credit Balance"), len(doc.items))
-	doc.append(
-		"items",
+	"""Selling's sidebar is a standard erpnext Sidebar that migrate re-syncs from its JSON, so the link
+	goes in the site layer (Custom Sidebar), which migrate never touches. Idempotent: an item already
+	in the layer is skipped."""
+	add_site_sidebar_item(
+		"Selling",
 		{
 			"type": "Link",
 			"label": "Customer Statement",
 			"link_type": "Report",
 			"link_to": "Customer Statement",
-			"child": 1,
+			"icon": "file-text",
 		},
 	)
-	doc.items.insert(pos, doc.items.pop())
-	for n, item in enumerate(doc.items, 1):
-		item.idx = n
-	doc.save(ignore_permissions=True)

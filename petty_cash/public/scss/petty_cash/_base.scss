@@ -1,5 +1,5 @@
 // Shared primitives for the petty-cash Desk page. Espresso tokens only: semantic colours,
-// the --padding-*/--margin-* spacing scale, --border-radius-*, --text-*/--weight-*.
+// the --padding-*/--margin-* spacing scale, --radius-*, --text-*/--weight-*.
 // Status labels use Desk's native .indicator-pill (utils.badge), not custom badges.
 // Everything is scoped under .pc-root (page) or .pc-dialog (frappe.ui.Dialog wrapper class).
 
@@ -31,7 +31,7 @@
 	.pc-card {
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		padding: var(--padding-md);
 	}
 	.pc-card-title {
@@ -44,52 +44,42 @@
 		gap: var(--padding-sm);
 	}
 
-	// Status callouts
+	// Status callouts: same look as Espresso .es-alert (filled surface, no border, themed icon)
 	.pc-alert {
+		--pc-al-icon: var(--ink-gray-6);
 		display: flex;
 		align-items: flex-start;
 		gap: var(--margin-sm);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-md);
 		padding: var(--margin-sm) var(--padding-md);
-		border: 1px solid;
+		background: var(--surface-gray-2);
+		color: var(--ink-gray-9);
 		font-size: var(--text-sm);
 		.pc-alert-title {
 			font-weight: var(--weight-semibold);
 			font-size: var(--text-base);
 		}
+		> .icon,
+		> .pc-icon-wrap .icon {
+			stroke: var(--pc-al-icon);
+		}
 	}
-	.pc-alert-red {
-		background: var(--surface-red-1);
-		border-color: var(--outline-red-1);
-		color: var(--ink-red-4);
-	}
-	.pc-alert-amber {
-		background: var(--surface-amber-1);
-		border-color: var(--outline-amber-1);
-		color: var(--ink-amber-3);
-	}
-	.pc-alert-blue {
-		background: var(--surface-blue-1);
-		border-color: var(--outline-blue-1);
-		color: var(--ink-blue-3);
-	}
-	.pc-alert-green {
-		background: var(--surface-green-1);
-		border-color: var(--outline-green-1);
-		color: var(--ink-green-3);
+	@each $c, $theme in ("red", "red"), ("amber", "amber"), ("blue", "blue"), ("green", "green") {
+		.pc-alert-#{$c} {
+			--pc-al-icon: var(--ink-#{$theme}-6);
+			background: var(--surface-#{$theme}-2);
+		}
 	}
 	.pc-alert-gray {
-		background: var(--surface-gray-1);
-		border-color: var(--border-color);
-		color: var(--text-muted);
+		color: var(--ink-gray-7);
 	}
 
 	.pc-amount-in {
-		color: var(--ink-green-3);
+		color: var(--ink-green-7);
 		font-weight: var(--weight-semibold);
 	}
 	.pc-amount-out {
-		color: var(--ink-red-4);
+		color: var(--ink-red-7);
 		font-weight: var(--weight-semibold);
 	}
 
@@ -107,10 +97,10 @@
 			padding: var(--padding-xs) var(--padding-sm);
 			white-space: nowrap;
 			&:first-child {
-				border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+				border-radius: var(--radius-md) 0 0 var(--radius-md);
 			}
 			&:last-child {
-				border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+				border-radius: 0 var(--radius-md) var(--radius-md) 0;
 			}
 			.icon {
 				margin-right: var(--padding-xs);
@@ -162,7 +152,7 @@
 		padding: 0 var(--padding-xs);
 		border: 1px solid var(--border-color);
 		background: var(--control-bg);
-		border-radius: var(--border-radius-md);
+		border-radius: var(--radius-md);
 		color: var(--text-muted);
 		font-size: var(--text-sm);
 		&.active {

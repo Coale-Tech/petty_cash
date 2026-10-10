@@ -70,35 +70,12 @@
 	.pc-tabs-card {
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		margin-bottom: var(--margin-md);
 	}
-	.pc-tabs {
-		display: flex;
-		padding: 0 var(--padding-sm);
-		border-bottom: 1px solid var(--border-color);
-		overflow-x: auto;
-	}
-	.pc-tab {
-		display: flex;
-		align-items: center;
-		gap: var(--padding-xs);
-		white-space: nowrap;
-		padding: var(--margin-sm) 0;
-		margin: 0 var(--margin-sm) -1px;
-		border: 0;
-		border-bottom: 1px solid transparent;
-		background: none;
-		font-size: var(--text-base);
-		font-weight: var(--weight-regular);
-		color: var(--text-light);
-		&:hover {
-			color: var(--text-color);
-		}
-		&.active {
-			color: var(--text-neutral);
-			border-bottom-color: var(--text-color);
-		}
+	// Tab bar itself is the native Espresso .es-tabs__list; only the card inset and badge reset live here
+	.es-tabs__list {
+		padding-inline: var(--padding-md);
 		.indicator-pill {
 			margin: 0;
 		}
@@ -130,11 +107,11 @@
 	.pc-stat {
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-lg);
+		border-radius: var(--radius-lg);
 		padding: var(--padding-md);
 	}
-	@each $c, $surface, $ink in ("blue", "blue-2", "blue-3"), ("red", "red-2", "red-4"),
-		("green", "green-2", "green-3"), ("purple", "violet-1", "violet-1")
+	@each $c, $surface, $ink in ("blue", "blue-2", "blue-7"), ("red", "red-2", "red-7"),
+		("green", "green-2", "green-7"), ("purple", "violet-2", "violet-7")
 	{
 		.pc-stat-#{$c} .pc-stat-icon {
 			background: var(--surface-#{$surface});
@@ -162,7 +139,7 @@
 	.pc-stat-icon {
 		display: flex;
 		padding: var(--padding-sm);
-		border-radius: var(--border-radius-full);
+		border-radius: var(--radius-full);
 	}
 	.pc-stat-foot {
 		display: flex;
@@ -185,7 +162,7 @@
 		text-align: left;
 		background: var(--card-bg);
 		border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-md);
+		border-radius: var(--radius-md);
 		color: var(--text-color);
 		&:hover {
 			background: var(--btn-default-hover-bg, var(--subtle-accent));
@@ -197,7 +174,7 @@
 		}
 		&.pc-danger {
 			border-color: var(--outline-red-2);
-			color: var(--ink-red-4);
+			color: var(--ink-red-7);
 			&:hover {
 				background: var(--surface-red-1);
 			}
@@ -213,16 +190,16 @@
 		color: var(--text-light);
 	}
 	.pc-qa-blue {
-		color: var(--ink-blue-3);
+		color: var(--ink-blue-7);
 	}
 	.pc-qa-orange {
-		color: var(--ink-amber-3);
+		color: var(--ink-amber-7);
 	}
 	.pc-qa-red {
-		color: var(--ink-red-3);
+		color: var(--ink-red-7);
 	}
 	.pc-qa-green {
-		color: var(--ink-green-3);
+		color: var(--ink-green-7);
 	}
 
 	// List cards (Recent Transactions / Transactions)

@@ -81,7 +81,7 @@ petty_cash.PettyCashPage = class PettyCashPage {
 			</div>
 			<div class="pc-status"></div>
 			<div class="pc-tabs-card" style="display: none">
-				<nav class="pc-tabs"></nav>
+				<nav class="es-tabs__list" role="tablist"></nav>
 				<div class="pc-tab-body"></div>
 			</div>
 		</div>`).appendTo(page.main);
@@ -97,8 +97,8 @@ petty_cash.PettyCashPage = class PettyCashPage {
 			.on("click", ".pc-configure", () => this.set_tab("settings"));
 		this.$card = this.$root.find(".pc-tabs-card");
 		this.$nav = this.$root
-			.find(".pc-tabs")
-			.on("click", ".pc-tab", (e) => this.set_tab(e.currentTarget.dataset.tab));
+			.find(".es-tabs__list")
+			.on("click", ".es-tabs__tab", (e) => this.set_tab(e.currentTarget.dataset.tab));
 		this.$body = this.$root.find(".pc-tab-body");
 
 		this.refresh();
@@ -208,8 +208,8 @@ petty_cash.PettyCashPage = class PettyCashPage {
 		this.$nav.html(
 			tabs
 				.map(
-					(t) => `<button class="pc-tab ${
-						t.key === this.tab ? "active" : ""
+					(t) => `<button class="es-tabs__tab" role="tab" data-state="${
+						t.key === this.tab ? "active" : "inactive"
 					}" data-tab="${t.key}">
 						${icon(t.icon)}${t.label}${
 						t.badge && counts[t.key]
@@ -218,8 +218,14 @@ petty_cash.PettyCashPage = class PettyCashPage {
 					}
 					</button>`
 				)
-				.join("")
+				.join("") + `<span class="es-tabs__indicator" aria-hidden="true"></span>`
 		);
+		// the sliding bar reads its position from these two custom properties
+		const active = this.$nav.find("[data-state=active]")[0];
+		this.$nav.find(".es-tabs__indicator").css({
+			"--es-tabs-indicator-x": `${active.offsetLeft}px`,
+			"--es-tabs-indicator-w": `${active.offsetWidth}px`,
+		});
 
 		// Fresh container per render so handlers a renderer binds on it never accumulate.
 		const $c = $('<div class="pc-tab-body"></div>');

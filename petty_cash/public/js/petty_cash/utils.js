@@ -37,7 +37,7 @@ export const badge = (label, color = "gray", dot = true) =>
 
 export const voucher_link = (doctype, name) =>
 	name
-		? `<a class="pc-link" href="/app/${frappe.router.slug(doctype)}/${encodeURIComponent(
+		? `<a class="pc-link" href="/desk/${frappe.router.slug(doctype)}/${encodeURIComponent(
 				name
 		  )}">${esc(name)}</a>`
 		: "-";

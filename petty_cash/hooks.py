@@ -15,7 +15,8 @@ add_to_apps_screen = [
 		"name": "petty_cash",
 		"logo": "/assets/petty_cash/images/petty-cash.svg",
 		"title": "Petty Cash",
-		"route": "/app/petty-cash",
+		"route": "/desk/petty-cash",
+		"sequence_id": 10,
 		"has_permission": "petty_cash.api.has_app_permission",
 	}
 ]
