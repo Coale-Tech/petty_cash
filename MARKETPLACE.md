@@ -30,3 +30,7 @@ Available on the Frappe Cloud Marketplace. ERPNext is provisioned automatically 
 ## License
 
 GPL-3.0
+
+## Legal
+
+[Terms of Service](TERMS.md) · [Privacy Policy](PRIVACY.md)
