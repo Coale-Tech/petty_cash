@@ -240,7 +240,7 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
       <table class="st-aging">
         <thead>
           <tr>
-            <th>{{ _("0-30 Days") }}</th><th>{{ _("31-60 Days") }}</th><th>{{ _("61-90 Days") }}</th><th>{{ _("91+ Days") }}</th>
+            <th>{{ _("Not Due") }}</th><th>{{ _("0-30 Days") }}</th><th>{{ _("31-60 Days") }}</th><th>{{ _("61-90 Days") }}</th><th>{{ _("91+ Days") }}</th>
             <th>{{ _("Credits on Account") }}</th><th>{{ _("Total Due") }}</th>
           </tr>
         </thead>
@@ -249,7 +249,8 @@ body:has(> .print-format > .wrapper) { padding-top: 0 !important; }
             <td class="st-num">{{ money(st.ageing[0][1], currency=st.currency) }}</td>
             <td class="st-num">{{ money(st.ageing[1][1], currency=st.currency) }}</td>
             <td class="st-num">{{ money(st.ageing[2][1], currency=st.currency) }}</td>
-            <td class="st-num">{{ money(st.ageing[3:] | map(attribute=1) | sum, currency=st.currency) }}</td>
+            <td class="st-num">{{ money(st.ageing[3][1], currency=st.currency) }}</td>
+            <td class="st-num">{{ money(st.ageing[4:] | map(attribute=1) | sum, currency=st.currency) }}</td>
             <td class="st-num">{{ money(st.credits, currency=st.currency) }}</td>
             <td class="st-num st-aging-total">{{ money(st.closing, currency=st.currency) }}</td>
           </tr>

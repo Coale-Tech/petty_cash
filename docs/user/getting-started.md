@@ -6,6 +6,8 @@
 2. Open **Petty Cash → Settings** (or `/desk/petty-cash-float/new`) and pick the cost centre, petty cash account, replenishment bank account, imprest amount and replenishment trigger. Save.
 3. Repeat with **New Float** for each cost centre.
 
+![Float settings](screenshots/settings.png)
+
 Saving with a company and an empty template table seeds six expense templates (Fuel & Transport, Airtime & Data, Office Supplies, Cleaning & Consumables, Repairs & Maintenance, Miscellaneous). A template whose account is missing falls back to the float's default expense account.
 
 ## 2. Give people access
@@ -22,6 +24,8 @@ Give the person who holds the float the **Petty Cash Custodian** role plus **Acc
 
 Open **Petty Cash** from the apps screen. Pick the float in the page header.
 
+![Dashboard](screenshots/dashboard.png)
+
 | Tab | What it does |
 |---|---|
 | Dashboard | Balance, replenishment status, today's spend, quick actions, recent transactions |
@@ -31,11 +35,25 @@ Open **Petty Cash** from the apps screen. Pick the float in the page header.
 | Replenishments | Draft Bank Entries for the Accounts Manager to submit |
 | Settings | The selected float, including **New Float** |
 
-Quick actions:
+![Transactions](screenshots/transactions.png)
 
-- **Record Expense** submits a Cash Entry from an expense template. Cost Center defaults to the float's; choose another non-group cost centre of the same company to charge it elsewhere.
-- **Pay Supplier** submits a Payment Entry from petty cash, allocated against the supplier's outstanding Purchase Invoices.
-- **Replenish Cash** submits a Bank Entry from the replenishment bank account up to the imprest amount.
+### Quick actions
+
+**Record Expense** submits a Cash Entry from an expense template. Cost Center defaults to the float's; choose another non-group cost centre of the same company to charge it elsewhere.
+
+![Record Expense](screenshots/record-expense-dialog.png)
+
+**Pay Supplier** submits a Payment Entry from petty cash. Enter the amount, tick the invoices to settle and use **Auto-Allocate** (or type the allocation per invoice). The allocation cannot exceed the payment amount or an invoice's outstanding amount.
+
+![Pay Supplier](screenshots/pay-supplier-dialog.png)
+
+**Replenish Cash** submits a Bank Entry from the replenishment bank account, suggesting the amount that restores the imprest level.
+
+![Replenish Cash](screenshots/replenish-dialog.png)
+
+**New Request** on the Replenishments tab saves a draft Bank Entry instead, for the Accounts Manager to review and submit.
+
+![Replenishments](screenshots/replenishments.png)
 
 ## Multi-company rules
 

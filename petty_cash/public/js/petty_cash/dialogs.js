@@ -531,7 +531,7 @@ export function open_pay_supplier_dialog(ctx) {
 						</div>
 						<div class="pc-xs pc-mt">${esc(
 							__(
-								"This will create an ERPNext Payment Entry document and debit the petty cash account."
+								"This will create an ERPNext Payment Entry document and credit the petty cash account."
 							)
 						)}</div>
 					</div></div>

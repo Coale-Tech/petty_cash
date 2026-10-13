@@ -45,7 +45,7 @@ const list_head = (cols) =>
 	cols
 		.map(
 			([label, ic, right]) =>
-				`<th class="${right ? "text-right" : ""}">${icon(ic)}${label}</th>`
+				`<th class="${right ? "text-right" : ""}">${icon(ic)}${esc(label)}</th>`
 		)
 		.join("");
 

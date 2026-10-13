@@ -16,7 +16,7 @@ from frappe.query_builder import DocType
 from frappe.query_builder.functions import Sum
 from frappe.utils import add_months, flt, getdate, nowdate
 
-AGEING_LABELS = ("0-30", "31-60", "61-90", "91-120", "120+")
+AGEING_LABELS = ("0-30", "31-60", "61-90", "91-120", "120+")  # days past due; "Not due" is prepended
 
 
 def execute(filters=None):
@@ -26,17 +26,17 @@ def execute(filters=None):
 
 	st = get_statement(filters.customer, filters.company, filters.from_date, filters.to_date)
 	columns = [
-		{"fieldname": "date", "label": _("Date"), "fieldtype": "Date", "width": 100},
-		{"fieldname": "type", "label": _("Type"), "fieldtype": "Data", "width": 110},
+		{"fieldname": "date", "label": _("Date"), "fieldtype": "Date", "width": 120},
+		{"fieldname": "type", "label": _("Type"), "fieldtype": "Data", "width": 140},
 		{
 			"fieldname": "reference",
 			"label": _("Reference"),
 			"fieldtype": "Dynamic Link",
 			"options": "link_doctype",
-			"width": 170,
+			"width": 200,
 		},
 		{"fieldname": "link_doctype", "label": _("Voucher Type"), "fieldtype": "Data", "hidden": 1},
-		{"fieldname": "due_date", "label": _("Due Date"), "fieldtype": "Date", "width": 100},
+		{"fieldname": "due_date", "label": _("Due Date"), "fieldtype": "Date", "width": 120},
 		{
 			"fieldname": "debit",
 			"label": _("Debit"),
@@ -239,6 +239,8 @@ def _ageing(customer, company, to_date):
 	)
 	row = data[0] if data else {}
 	buckets = [(label, flt(row.get(f"range{i}"))) for i, label in enumerate(AGEING_LABELS, 1)]
+	# the summary only buckets overdue amounts; what is not yet due is the rest of the outstanding
+	buckets.insert(0, (_("Not due"), flt(row.get("outstanding")) - sum(b[1] for b in buckets)))
 	return buckets, -flt(row.get("advance")) or 0.0
 
 

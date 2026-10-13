@@ -2,6 +2,8 @@
 
 The native **Add multiple** button under the items table of Quotation, Sales Order, Sales Invoice, Delivery Note, Supplier Quotation, Purchase Order, Purchase Receipt, Purchase Invoice, Material Request and Stock Entry opens a **Select Items** dialog.
 
+![Select Items](screenshots/select-items-dialog.png)
+
 - Search by Item Code, Item Name or Free Text (every word must match).
 - **Item in Stock** and **Zero Stock Only** filters.
 - One column per leaf warehouse of the company, list price and Total Qty.

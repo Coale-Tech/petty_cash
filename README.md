@@ -6,6 +6,8 @@
 
 Available on the Frappe Cloud Marketplace. User guide: [docs/user](docs/user/index.md). Changes: [CHANGELOG.md](CHANGELOG.md).
 
+![Petty Cash dashboard](docs/user/screenshots/dashboard.png)
+
 ## Overview
 
 Imprest-style petty cash console for ERPNext v16, as a single Desk page (`/desk/petty-cash`).
