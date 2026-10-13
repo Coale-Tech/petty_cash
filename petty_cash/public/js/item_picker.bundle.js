@@ -1,5 +1,5 @@
 // Add multiple - replaces the native "Add multiple" grid button (LinkSelector: one quantity
-// prompt per item, no stock) with the "Select Items" dialog from kimzone's item_selector.js,
+// prompt per item, no stock) with a "Select Items" dialog,
 // on every ERPNext items table: search by code / name / free text, "Item in Stock" and
 // "Zero Stock Only" filters, a quantity column per warehouse, tick or double-click to add.
 

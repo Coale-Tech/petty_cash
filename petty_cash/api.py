@@ -579,7 +579,9 @@ def create_journal_entry(data: str | dict, petty_cash_float: str):
 		frappe.throw(_("A petty cash entry must include account {0}").format(settings.petty_cash_account))
 	for row in je.accounts:
 		if frappe.db.get_value("Account", row.account, "company") != settings.company:
-			frappe.throw(_("Account {0} does not belong to company {1}").format(row.account, settings.company))
+			frappe.throw(
+				_("Account {0} does not belong to company {1}").format(row.account, settings.company)
+			)
 		if row.cost_center:
 			_cost_center(settings, row.cost_center)
 	_write_remark(je)

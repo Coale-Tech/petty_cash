@@ -1,4 +1,12 @@
-### Petty Cash
+# Petty Cash
+
+[![CI](https://github.com/Coale-Tech/petty_cash/actions/workflows/ci.yml/badge.svg)](https://github.com/Coale-Tech/petty_cash/actions/workflows/ci.yml)
+[![Linters](https://github.com/Coale-Tech/petty_cash/actions/workflows/linters.yml/badge.svg)](https://github.com/Coale-Tech/petty_cash/actions/workflows/linters.yml)
+![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)
+
+Available on the Frappe Cloud Marketplace. User guide: [docs/user](docs/user/index.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+
+## Overview
 
 Imprest-style petty cash console for ERPNext v16, as a single Desk page (`/desk/petty-cash`).
 Every money movement is a native ERPNext voucher; the balance is the GL balance of the
@@ -66,13 +74,12 @@ Requires `erpnext`.
   on the Customer form): opening balance, invoices/payments/returns with running balance, ageing.
 - **Statement PDF** renders the `Customer Statement` print format (Chrome PDF generator) with the issuer's logo,
   address, tax ID and contacts from the Company and the first company Bank Account as payment details.
-  Styled on Espresso tokens (`print.bundle.css` variables, Inter) with a running head and paged footer; layout
-  borrowed from vigilant's statement (itself adapted from kimzone).
+  Styled on Espresso tokens (`print.bundle.css` variables, Inter) with a running head and paged footer.
 
 #### Add Multiple Items
 
 - The native **Add multiple** button under the items table of Quotation, Sales Order/Invoice, Delivery Note,
-  Supplier Quotation, Purchase Order/Receipt/Invoice, Material Request and Stock Entry opens kimzone's **Select
+  Supplier Quotation, Purchase Order/Receipt/Invoice, Material Request and Stock Entry opens a **Select
   Items** dialog instead of the one-at-a-time link selector: search by Item Code / Item Name / Free Text (every
   word must match), **Item in Stock** / **Zero Stock Only** filters, a resizable table with a column per leaf
   warehouse of the company, list price and Total Qty, tick rows and set quantities, **Add Selected Items**,
@@ -82,14 +89,13 @@ Requires `erpnext`.
   with the most stock. Existing rows for the same item get their quantity increased.
 - Selling documents list only sales items, buying documents only purchase items. Price = list rate from the
   document's price list; the row's real rate still comes from ERPNext's `get_item_details` when it lands.
-- Not ported from kimzone: customer-first guard, territory columns, retail/wholesale cached prices.
 
 #### Notes
 
 - Assets are bundled as `petty_cash_desk.bundle.{js,css}`; bundle names are bench-wide, so another app's
   `petty_cash.bundle.*` cannot shadow them.
 - Cannot be installed on a site that already defines the `Petty Cash Float` / `Petty Cash Expense Template`
-  doctypes, the `petty-cash` page, or a `Customer Statement` report/print format (e.g. from `raven`).
+  doctypes, the `petty-cash` page, or a `Customer Statement` report/print format.
 - Upgrading from the single `Petty Cash Settings` doctype: `migrate` turns it into a float on the company's
   default cost centre.
 
