@@ -4,8 +4,6 @@ Imprest petty cash console for **ERPNext v16**, as a single Desk page.
 
 Every money movement is a native ERPNext voucher and the balance is the GL balance of the float's cash account, so nothing keeps a second copy of a number. Each cost centre runs its own float with its own cash account, and every voucher is posted in the float's company.
 
-> This file is the canonical **Frappe Cloud Marketplace "Long Description"** source. It deliberately contains **no installation commands** (no `get-app`, `install-app`, or migration commands), which the marketplace metadata check rejects. Paste it into the listing's Long Description field, or sync the listing from it.
-
 ## Key Features
 
 - Dashboard with balance, replenishment status, today's spend, quick actions and recent transactions

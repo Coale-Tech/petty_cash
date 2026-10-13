@@ -39,16 +39,9 @@ Quick actions:
 - **Pay Supplier** - submits a Payment Entry from petty cash, allocated against the supplier's outstanding Purchase Invoices
 - **Replenish Cash** - submits a Bank Entry from the replenishment bank account back up to the imprest amount
 
-#### Installation
+#### Requirements
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app https://github.com/Coale-Tech/petty_cash --branch main
-bench --site <site> install-app petty_cash
-bench build --app petty_cash
-```
-
-Requires `erpnext`.
+ERPNext v16.
 
 #### Configure
 
