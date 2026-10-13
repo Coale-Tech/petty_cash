@@ -58,15 +58,15 @@ def _prices(price_list, item_codes):
 
 @frappe.whitelist()
 def search_items(
-	doctype,
-	company,
-	search=None,
-	search_by="free_text",
-	in_stock_only=0,
-	zero_stock_only=0,
-	start=0,
-	page_length=25,
-	price_list=None,
+	doctype: str,
+	company: str,
+	search: str | None = None,
+	search_by: str = "free_text",
+	in_stock_only: int = 0,
+	zero_stock_only: int = 0,
+	start: int = 0,
+	page_length: int = 25,
+	price_list: str | None = None,
 ):
 	"""One page of items, the total the filters match, and the warehouse columns.
 

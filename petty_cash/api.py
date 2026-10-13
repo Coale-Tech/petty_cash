@@ -30,7 +30,7 @@ def _write_remark(je):
 	reference = je.cheque_no and _("Reference #{0} dated {1}").format(
 		je.cheque_no, formatdate(je.cheque_date)
 	)
-	je.remark = "\n".join(filter(None, (je.user_remark, reference)))
+	je.remark = "\n".join([line for line in (je.user_remark, reference) if line])
 	je.flags.skip_remarks_creation = True
 
 
@@ -286,7 +286,7 @@ def replenish_petty_cash(
 
 def _access(settings=None):
 	"""Settings rights for one float; with none yet, managing = creating the first float."""
-	can_create = bool(frappe.has_permission("Petty Cash Float", "create"))
+	can_create = frappe.has_permission("Petty Cash Float", "create")
 	can_manage = bool(settings.has_permission("write")) if settings else can_create
 	return {
 		"can_manage_settings": can_manage,
